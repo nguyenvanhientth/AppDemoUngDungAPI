@@ -15,7 +15,7 @@ export default class Login extends Component {
     headerMode: 'none',
     title: 'Login',
     headerStyle: {
-      backgroundColor: '#1583F8',
+      backgroundColor: '#29ACE4',
     },
     headerTintColor: '#fff',
     headerTitleStyle: {

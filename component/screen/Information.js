@@ -4,19 +4,19 @@ import {AppRegistry,StyleSheet,Text,View,Image,ScrollView,
 import DateTimePicker from "react-native-modal-datetime-picker";
 import env from '../environment/env';
 import Dialog from "react-native-dialog";
+import Communications from 'react-native-communications';
 import HeaderNavigation from './header/HeaderNavigation';
 
 
 var STORAGE_KEY = 'key_access_token';
 const update = require('../image/update.png') ;
 const date = require('../image/date.png') ;
-const user = require('../image/ic_user.png') ;
-const name = require('../image/name.png') ;
+const Male = require('../image/male.png') ;
+const Female = require('../image/female.png') ;
+const image = require('../image/image.png') ;
 const phone = require('../image/phone.png') ;
 const address = require('../image/address.png') ;
-const dob = require('../image/dob.png') ;
 const email = require('../image/email.png') ;
-const gender = require('../image/gender.jpg') ;
 const role = require('../image/role.png') ;
 const information = require('../image/information.png') ;
 const BASE_URL = env;
@@ -25,7 +25,7 @@ export default class Information extends Component {
     static navigationOptions = {
         title: 'Personal Information',
         drawerIcon: ({icon}) =>(
-            <Image source = {information} resizeMode="contain" style = {[styles.icon,{headerTintColor:icon}]} />
+            <Image source = {information} resizeMode="contain" style = {[styles.icon]} />
         ),
       };
     constructor(props) {
@@ -51,6 +51,7 @@ export default class Information extends Component {
       Address1: null,
       PhoneNumber1: null,
       isDateTimePickerVisible: false,
+      avatar: ''
     };
   }
   
@@ -78,7 +79,14 @@ export default class Information extends Component {
                     PhoneNumber: resJson.phoneNumber,
                     DOB: resJson.dateOfBirth,
                     Gender: resJson.gender
-                });       
+                }); 
+                if (this.state.Gender === 'Female') {
+                    this.setState({avatar: Female})
+                } else {
+                    this.setState({
+                        avatar: Male
+                    })
+                }      
             })
             .catch ((error) => {
                 console.warn('AsyncStorage error:' + error.message);
@@ -173,29 +181,53 @@ export default class Information extends Component {
         this.setState({ DOB1: date.toString() });
         this._hideDateTimePicker();
     };
+    _show =() =>{
+        alert(this.state.Email)
+    }
  render() {
     const { isDateTimePickerVisible, DOB1 } = this.state;
         return (
             <View style={styles.container}>
                 <StatusBar hidden={false}></StatusBar>
                 <HeaderNavigation {...this.props}></HeaderNavigation>
-                <Text style = {{color: "#0404B4", fontSize: 30}}> Hi {this.state.firstName}</Text>
+                <View style = {styles.contentName}>
+                    <Text style = {{color: "#fff", fontSize: 30}}> Hi {this.state.firstName} {this.state.lastName}</Text>
+                    <Text style = {{color: "#fff", fontSize: 20}}>Active | {this.state.Gender} | Born {this.state.DOB}</Text>
+                        <TouchableOpacity><Image source = {this.state.avatar} style = {{width: 100,height: 100,borderRadius: 100, margin: 10}} /></TouchableOpacity>
+                    <View style = {{flexDirection: 'row'}}>
+                        <TouchableOpacity onPress = {()=>Communications.phonecall(this.state.PhoneNumber,true)}>
+                            <Image source = {phone} style = {{width: 25,height: 25,margin: 10}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress = {()=>Communications.phonecall(this.state.PhoneNumber,true)}>
+                            <Image source = {image} style = {{width: 25,height: 25,margin: 10}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress = {()=>this._show()}>
+                            <Image source = {email} style = {{width: 25,height: 25,margin: 10}} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <View style={styles.ThongTin}>
-                    <Text style = {{fontSize: 32, color: "#424040", textAlign: 'left'}}>Information:</Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {user} /> <Text style = {styles.text1}>{this.state.userName}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {name} /><Text style = {styles.text1}> {this.state.firstName}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {name} /> <Text style = {styles.text1}>{this.state.lastName}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {address} /> <Text style = {styles.text1}>{this.state.Address}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {email} /> <Text style = {styles.text1}>{this.state.Email}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {dob} /><Text style = {styles.text1}> {this.state.DOB}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {gender} /> <Text style = {styles.text1}>{this.state.Gender}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {phone} /> <Text style = {styles.text1}>{this.state.PhoneNumber}</Text> </Text>
-                    <Text style={styles.text}> <Image style = {styles.icon} resizeMode="contain" source = {role} /><Text style = {styles.text1}> {this.state.Position}</Text></Text>
+                    <View style={styles.text}>
+                        <Image style = {styles.icon} resizeMode="contain" source = {address}/> 
+                        <Text style = {styles.text1}>{this.state.Address}</Text> 
+                    </View>
+                    <View style={styles.text}> 
+                        <Image style = {styles.icon} resizeMode="contain" source = {email} /> 
+                        <Text style = {styles.text1}>{this.state.Email}</Text> 
+                    </View>
+                    <View style={styles.text}> 
+                        <Image style = {styles.icon} resizeMode="contain" source = {phone} /> 
+                        <Text style = {styles.text1}>{this.state.PhoneNumber}</Text> 
+                    </View>
+                    <View style={styles.text}> 
+                        <Image style = {styles.icon} resizeMode="contain" source = {role} />
+                        <Text style = {styles.text1}> {this.state.Position}</Text>
+                    </View>
                 </View>
                 <View style={styles.footer}>
                     <TouchableOpacity activeOpacity={.5} onPress={this.dialogUpdate.bind(this)} keyboardShouldPersistTaps={true}>
-                        <View style={styles.button}>
-                            <Image style = {styles.iconAdd} source = {update} />
+                        <View style={[styles.button,]}>
+                            <Image style = {[styles.iconAdd,{backgroundColor: '#29ACE4'}]} source = {update} />
                         </View>   
                     </TouchableOpacity>
                 </View>
@@ -257,20 +289,20 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20
     },
-  buttonText: {
-      fontSize: 16,
-      color:'#FFFFFF',
-      textAlign: 'center',   
-  },
   text: {
-    color: '#642EFE',
-    fontSize: 18,
-    textAlign: 'center'
+    backgroundColor: '#fff',
+    justifyContent: 'flex-start',
+    borderBottomWidth: 2,
+    borderBottomColor: 'gray',
+    padding: 20,
+    width: '100%',
+    flexDirection: 'row'
   },
   text1: {
     color: 'black',
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginLeft: 15
   },
   textDate: {
     color: '#424040',
@@ -291,6 +323,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width:50,
     height:50,
+    borderRadius: 50
     },
     DOB: {
         flexDirection: 'row',
@@ -307,5 +340,10 @@ const styles = StyleSheet.create({
     icon: {
         width: 25,
         height: 25
+    },
+    contentName: {
+        alignItems: "center",
+        backgroundColor: '#29ACE4',
+        padding: 20
     }
 });

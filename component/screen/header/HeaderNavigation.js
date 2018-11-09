@@ -25,9 +25,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        backgroundColor: '#1583F8',
-        borderBottomWidth: 5,
-        borderBottomColor: 'white',
+        backgroundColor: '#29ACE4',
     },
     btnDrawer:{
         marginLeft: 10, 
@@ -36,7 +34,7 @@ const styles = StyleSheet.create({
     },
     titleText:{
         position: 'absolute', 
-        left: '40%',  
+        left: '45%',  
         fontWeight: '500', 
         fontSize: 18,
         color: '#fff'

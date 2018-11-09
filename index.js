@@ -27,8 +27,8 @@ const NavigationProfile = (props) => (
 
 const DrawerStack = createDrawerNavigator({
   Main: { screen: Main },
-  Personal_Information: { screen: Information },
-  Chane_Password: { screen: ChanePassword },
+  Profile: { screen: Information },
+  Password: { screen: ChanePassword },
 },
 {
   contentComponent: NavigationProfile // edit drawer stack
@@ -38,7 +38,7 @@ const DrawerNavigation = createStackNavigator({
   DrawerStack: { screen: DrawerStack },
 }, {
   navigationOptions: ({navigation}) => ({
-    // header: null,
+     header: null,
     // headerStyle: {backgroundColor: '#1583F8',},
     // title: 'Main',
     // headerTintColor: '#fff',

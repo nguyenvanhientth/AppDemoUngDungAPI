@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,View,Image,ScrollView,AsyncStorage,TouchableOpacity} from 'react-native';
+import {StyleSheet,Text,View,Image,ScrollView,AsyncStorage,TouchableOpacity,
+    ActivityIndicator} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
-const receive = require('../image/confirm.png');
-const confirm = require('../image/confirmRequest.png');
-const finish = require('../image/finish.png');
 const time = require('../image/timeRequest.png');
 const address = require('../image/address.jpg');
 var STORAGE_KEY = 'key_access_token';
@@ -14,7 +12,7 @@ export default class Request extends Component{
     static navigationOptions = {
         title: 'Detail',
         headerStyle: {
-            backgroundColor: '#1583F8',
+            backgroundColor: '#29ACE4',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
@@ -31,7 +29,8 @@ export default class Request extends Component{
             repairPersonId: '',
             PersonName: '',
             Position:'',
-            selectImage: null
+            selectImage: null,
+            loadding: true
         }
     }
     componentDidMount(){
@@ -56,6 +55,7 @@ export default class Request extends Component{
                       address: resData.address,
                       repairPersonId: resData.timeBeginRequest,
                       selectImage: resData.pictureRequest[0],
+                      loadding:false
                     });
                     //console.warn('data',this.state.repairPersonId);
                 })
@@ -166,7 +166,7 @@ export default class Request extends Component{
                 })
               })
               .then((responseJSON) => {  
-                  console.warn(responseJSON);
+                  //console.warn(responseJSON);
                     if(responseJSON.ok){
                         this.props.navigation.navigate('drawerStack');
                         alert('Confirm Success!');
@@ -182,28 +182,38 @@ export default class Request extends Component{
         })
     }
     render(){
+        if(this.state.loadding){
+            return(
+                <View style = {styles.container}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }else{
         if(this.state.Position !== "Supervisor"){
             return (
                 <View style = {styles.container}>
                     <ScrollView >
-                    <View style = {{paddingBottom: 70}}>
-                        <Image style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', paddingTop: 10}} source = {{uri: this.state.selectImage}} />
-                        <ScrollView horizontal = {true} style = {{marginTop: 10}}>
+                    <View style = {{paddingBottom: 20}}>
+                        <View style = {{alignItems: "center"}}>
+                            <Image style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, marginBottom: 10,
+                             borderRadius:10}} resizeMode = "contain" source = {{uri: this.state.selectImage}} />
+                        <ScrollView horizontal = {true} style = {{marginTop: 10, borderColor: 'gray', borderWidth: 1}}>
                         {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
                         </ScrollView>
+                        </View>
                         <Text style= {[styles.textTitle,{alignItems:'center'}]}> {this.state.content}</Text>
                         <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
                         <Text style={styles.textTitle}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
                     </View>
-                    </ScrollView>
                     <View style={styles.footer}>
-                        <TouchableOpacity  onPress={this._receive.bind(this)} keyboardShouldPersistTaps={true}>
-                            <Image style = {styles.confirm} source = {receive} resizeMode="contain" />
+                        <TouchableOpacity  onPress={this._receive.bind(this)} keyboardShouldPersistTaps={true} style = {{margin: 10}}>
+                            <Text style = {styles.button}>Receive</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={.5} onPress={()=>this.props.navigation.navigate('FinishPage',{id:this.state.id})} keyboardShouldPersistTaps={true}>
-                        <Image style = {styles.confirm} source = {finish} resizeMode="contain" />
+                        <TouchableOpacity style = {{margin:10}} activeOpacity={.5} onPress={()=>this.props.navigation.navigate('FinishPage',{id:this.state.id})} keyboardShouldPersistTaps={true}>
+                            <Text style = {styles.button}>Finish</Text>
                         </TouchableOpacity>
                     </View>
+                    </ScrollView>
                 </View>
             )
         }
@@ -211,22 +221,27 @@ export default class Request extends Component{
             return (
                 <View style = {styles.container}>
                 <ScrollView >
-                    <View style = {{paddingBottom: 70}}>
-                        <ScrollView horizontal = {true}>
-                        {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
-                        </ScrollView>
+                    <View style = {{paddingBottom: 20}}>
+                        <View style = {{alignItems: 'center'}}>
+                            <Image resizeMode = "contain" style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, borderRadius: 10, marginBottom: 10, 
+                                }} source = {{uri: this.state.selectImage}} />
+                            <ScrollView horizontal = {true} style = {{marginTop: 10,borderColor: 'gray', borderWidth: 1}}>
+                                {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
+                            </ScrollView>
+                        </View>
                         <Text style= {[styles.textTitle,{alignItems:'center',justifyContent:'center'}]}> {this.state.content}</Text>
                         <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
                         <Text style={styles.textTitle}><Image style = {styles.time} source = {time}/> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
                     </View>
-                </ScrollView>
                 <View style={styles.footer}>
                     <TouchableOpacity  onPress={this._finish.bind(this)} keyboardShouldPersistTaps={true}>
-                            <Image style = {styles.confirm} resizeMode = "contain" source = {confirm} />
+                        <Text style = {styles.button}>Confirm</Text>
                     </TouchableOpacity>
                 </View>
+                </ScrollView>
                 </View>
-            )
+                )
+            }
         }
     }
 }
@@ -234,20 +249,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal:15,
-        backgroundColor: '#E5E5E5'
+        backgroundColor: '#E5E5E5',
+        justifyContent: 'center'
     },
     image: {
         width: 100,
         height: 100,
         resizeMode: 'contain',
-        marginLeft: 10
+        margin: 5
     },
     text: {
         padding: 10,
         marginTop: 1,
         justifyContent: 'flex-start',
-        fontSize: 20,
-        color: 'black'
+        fontSize: 15,
+        color: 'black',
+        fontWeight: '100'
 
     },
     textTitle: {
@@ -261,33 +278,19 @@ const styles = StyleSheet.create({
     },
     footer: {
         flexDirection: 'row',
-        flex:1,
-        right: 0,
-        left: 0,
-        position: 'absolute',
+        paddingVertical: 8,
+        marginVertical:8,
         alignItems: "center",
         justifyContent: "center",
-        bottom: 15,
-        opacity: 1
     },
     button:{
         backgroundColor:"#5858FA",
-        paddingVertical: 8,
-        marginVertical:13,
-        alignItems: "center",
-        justifyContent: "center",
+        color: '#fff',
         borderRadius: 15,
-        padding: 25,
-        width: '100%',
-    },
-    buttonText: {
+        flex:1,
+        textAlign:'center',
+        padding: 12,
         fontSize: 16,
-        color:'#FFFFFF',
-        textAlign: 'center',   
-    },
-    confirm: {
-        width: 160,
-        height: 40,
     },
     time: {
         width: 30,

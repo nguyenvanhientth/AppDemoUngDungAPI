@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,View,Image,Dimensions,
-    AsyncStorage,TouchableOpacity,StatusBar,FlatList} from 'react-native';
+import {StyleSheet,Text,View,Image,Dimensions,ActivityIndicator,Platform,Picker,
+    AsyncStorage,TouchableOpacity,StatusBar,FlatList,TextInput} from 'react-native';
 import env from '../environment/env';
 import HeaderNavigation from './header/HeaderNavigation';
 
 var STORAGE_KEY = 'key_access_token';
-const background = require('../image/hinhnen.png') ;
 const addUser = require('../image/addUser.png') ;
 const company = require('../image/company.png') ;
 const addCompany = require('../image/addCompany.png') ;
@@ -21,7 +20,7 @@ export default class Main extends Component {
     static navigationOptions = {
         title: 'Main',
           drawerIcon: ({icon}) =>(
-            <Image source = {main} resizeMode="contain" style = {[styles.icon1,]} />
+            <Image source = {main} resizeMode="contain" style = {[styles.icon1]} />
         )
       };
     constructor(props) {
@@ -32,7 +31,15 @@ export default class Main extends Component {
         Position: '',
         companyName:'',
         addressCompany:'',
+        loading: true,
+        value: '',
+        data1: [],
+        dataName: [],
+        company: '',
+        supervisorName: '',
+        status: [{id:0, name: 'All Status'},{id:1, name: 'Waiting'},{id:2, name: 'To do'},{id:3, name: 'Done'},{id:4, name: 'Approved'},]
     };
+    this.array = [];
   }
   
   componentWillMount() {
@@ -53,13 +60,16 @@ export default class Main extends Component {
               .then((res) => res.json())
               .then((resData) => { 
                   this.setState({
-                      data : resData
+                      data : resData,
+                      loading: false,
                     });
                     //console.warn('data',this.state.data);
+                    this.array = resData
                 })
               .catch((err) => {
                 console.warn('Error',err);
-              })
+              });
+    //--------------------------------------------------------------------------
               fetch(BASE_URL + "Account/GetUserInformation",{
                 //method: "GET",
                 headers:{ 
@@ -77,7 +87,41 @@ export default class Main extends Component {
                 })
                 .catch ((error) => {
                     console.warn('AsyncStorage error:' + error.message);
-                }) 
+                });
+    //-------------------------------------------------- ----------------------
+                fetch(BASE_URL + 'Company/GetAllCompany',{
+                    headers: {
+                    'cache-control': 'no-cache',
+                    Authorization: 'Bearer ' + token,
+                    },
+                })
+                .then((res) => res.json())
+                .then((resData) => { 
+                    this.setState({
+                        data1 : [{id: 0,name: 'All Company'},...resData]
+                        });
+                        //console.warn('data',this.state.data1);
+                    })
+                .catch((err) => {
+                    console.warn('Get Company error',err);
+                })
+    //--------------------------------------------------------------------------------
+                fetch(BASE_URL + 'Account/GetSupervisor',{
+                    headers: {
+                    'cache-control': 'no-cache',
+                    Authorization: 'Bearer ' + token,
+                    },
+                })
+                .then((res) => res.json())
+                .then((resData) => { 
+                    this.setState({
+                        dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...resData]
+                        });
+                        //console.warn('data',this.state.data1);
+                    })
+                .catch((err) => {
+                    console.warn('Get Supervisor error',err);
+                })
             })
             //Get position        
         } catch (error) {
@@ -108,6 +152,14 @@ export default class Main extends Component {
          </TouchableOpacity>
         );
       }
+    renderHeader = () => {
+        return(
+            <View style = {styles.seach}>
+                <TextInput style = {{backgroundColor: '#fff', borderRadius: 20}} placeholder = 'Type here...' onChangeText = {(text) => this.seachName(text)} />
+            </View>
+        )
+    };
+    
       FlatListItemSeparator = () => {
         return (
           <View
@@ -141,123 +193,222 @@ export default class Main extends Component {
       }
     _name = (name1,name2) =>{
         if(name1 === null){
-            return <Text style={styles.title}>SupervisorName: <Text style = {styles.email}>{name2}</Text></Text>
+            return <Text style={styles.title}>Supervisor: <Text style = {styles.email}>{name2}</Text></Text>
         }
         else {
-            return <Text style={styles.title}>RepairPersonName: <Text style = {styles.email}>{name1}</Text></Text>
+            return <Text style={styles.title}>RepairPerson: <Text style = {styles.email}>{name1}</Text></Text>
         }
+    }
+    seachName = (text) =>{
+        const newData = this.array.filter((item) => {
+            const itemData = `${item.address.toUpperCase()}
+            ${item.status.toUpperCase()}`;
+            const textData = text.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+        });
+        this.setState({data : newData})
+    }
+    _seachStatus = (status) => {
+        this.setState({value: status})
+        if (status === 'All Status'|| status === undefined) {
+            status=''
+        }
+        const newData = this.array.filter((item) => {
+            const itemData = `${item.status.toUpperCase()}`;
+            const textData = status.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+        });
+        this.setState({
+            data: newData
+            })
+    }
+    _seachCompany = async (company) =>{
+        let arr = await this._seachStatus(this.state.value);
+        this.setState({company:company})
+        if (company === 'All Company') {
+            company = ''
+        }
+        const newData = this.array.filter((item) => {
+            const itemData = `${item.companyName.toUpperCase()}`;
+            const textData = company.toUpperCase();
+            return itemData.indexOf(textData) > -1;});
+        this.setState({
+            data: newData
+        })
+    }
+    _seachSupervisor = (supervisorName)=>{
+        this.setState({supervisorName:supervisorName})
+        if (supervisorName === 'Supervisor All') {
+            supervisorName = ''
+        }
+        const newData = this.array.filter((item) => {
+            const itemData = `${item.supervisorName.toUpperCase()}`;
+            const textData = supervisorName.toUpperCase();
+            return itemData.indexOf(textData) > -1;});
+        this.setState({
+            data: newData
+        })
     }
 
  render() {
-     if (this.state.Position === "Admin") {
-        return (
+    if(this.state.loading){
+        return(
+            <View style = {styles.background}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        )
+    }
+    else{
+        if (this.state.Position === "Admin") {
+            return (
+                <View style={ styles.background}>
+                    <StatusBar hidden={false}></StatusBar>
+                    <HeaderNavigation {...this.props}></HeaderNavigation>
+                    <View style = { styles.row}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('SignUpPage')}  keyboardShouldPersistTaps={true}>
+                            <View style = {[styles.buttonAd,{backgroundColor:'#08B358'}]}>
+                                <View style={styles.iconWrap}>
+                                    <Image source = {addUser} style = {styles.icon}/>
+                                </View>
+                                <Text style = {styles.textAd}> Create User </Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('CreateCompanyPage')} keyboardShouldPersistTaps={true}>
+                            <View style = {[styles.buttonAd,{backgroundColor: '#B558E8'}]}>
+                                <View style={styles.iconWrap}>
+                                    <Image source = {company} style = {styles.icon}/>
+                                </View>
+                                <Text style = {styles.textAd}> Create Company </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style = { styles.row}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {() =>this.props.navigation.navigate('ListCompanyPage')}  keyboardShouldPersistTaps={true}>
+                            <View style = {[styles.buttonAd,{backgroundColor: '#6AC6E5'}]}>
+                                <View style={styles.iconWrap}>
+                                    <Image source = {list} style = {styles.icon}/>
+                                </View>
+                                <Text style = {styles.textAd}> List Company </Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {this._onPressLogOut.bind(this)} keyboardShouldPersistTaps={true}>
+                            <View style = {[styles.buttonAd,{backgroundColor:'#BEDB6E'}]}>
+                                <View style={styles.iconWrap}>
+                                    <Image source = {addCompany} style = {styles.icon}/>
+                                </View>
+                                <Text style = {styles.textAd}> Company for User </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+            </View>
+            );
+        } else if(this.state.Position === "Supervisor"){
+            return(
             <View style={ styles.background}>
                 <StatusBar hidden={false}></StatusBar>
                 <HeaderNavigation {...this.props}></HeaderNavigation>
-                <View style = { styles.row}>
-                    <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('SignUpPage')}  keyboardShouldPersistTaps={true}>
-                        <View style = {[styles.buttonAd,{backgroundColor:'#08B358'}]}>
-                            <View style={styles.iconWrap}>
-                                <Image source = {addUser} style = {styles.icon}/>
-                            </View>
-                            <Text style = {styles.textAd}> Create User </Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('CreateCompanyPage')} keyboardShouldPersistTaps={true}>
-                        <View style = {[styles.buttonAd,{backgroundColor: '#B558E8'}]}>
-                            <View style={styles.iconWrap}>
-                                <Image source = {company} style = {styles.icon}/>
-                            </View>
-                            <Text style = {styles.textAd}> Create Company </Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
-                <View style = { styles.row}>
-                    <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {() =>this.props.navigation.navigate('ListCompanyPage')}  keyboardShouldPersistTaps={true}>
-                        <View style = {[styles.buttonAd,{backgroundColor: '#6AC6E5'}]}>
-                            <View style={styles.iconWrap}>
-                                <Image source = {list} style = {styles.icon}/>
-                            </View>
-                            <Text style = {styles.textAd}> List Company </Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {this._onPressLogOut.bind(this)} keyboardShouldPersistTaps={true}>
-                        <View style = {[styles.buttonAd,{backgroundColor:'#BEDB6E'}]}>
-                            <View style={styles.iconWrap}>
-                                <Image source = {addCompany} style = {styles.icon}/>
-                            </View>
-                            <Text style = {styles.textAd}> Company for User </Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
-           </View>
-        );
-     } else if(this.state.Position === "Supervisor"){
-         if(this.state.data.length === 0){
-            return (
-                <View style={ styles.background}>
-                    <StatusBar hidden={false}></StatusBar>
-                    <HeaderNavigation {...this.props}></HeaderNavigation>
-                    <Text style = {styles.text}> No Request!~ </Text>
-                    <View style={styles.footer}>
-                        <TouchableOpacity activeOpacity={.5} onPress={()=>this.props.navigation.navigate('UpdateImagePage')} keyboardShouldPersistTaps={true}>
-                            <View style={styles.button}>
-                                <Image style = {styles.iconAdd} source= {add} />
-                            </View>   
-                        </TouchableOpacity>
+                <View style = {styles.fuilter}>
+                    <View style = {styles.viewPicker}>
+                        <Picker
+                            selectedValue = {this.state.value}
+                            style = {styles.combobox}
+                            onValueChange = {(selectedValue) => this._seachStatus(selectedValue)}
+                        >
+                        {
+                            this.state.status.map((item,index) => {
+                                return <Picker.Item key = {index} label={item.name} value = {item.name} />
+                            })
+                        }
+                        </Picker>
+                    </View>
+                    <View style = {styles.viewPicker}>
+                        <Picker
+                            selectedValue = {this.state.company}
+                            style = {styles.combobox}
+                            onValueChange = {this._seachCompany.bind(this)}
+                        >
+                        {
+                            this.state.data1.map((item,index) => {
+                                return <Picker.Item key = {index} label={item.name} value = {item.name} />
+                            })
+                        }
+                        </Picker>
                     </View>
                 </View>
-            );
-        }
-        else return(
-        <View style={ styles.background}>
-            <StatusBar hidden={false}></StatusBar>
-            <HeaderNavigation {...this.props}></HeaderNavigation>
-            <View style = {styles.Container}>
-                <FlatList
-                data={this.state.data}
-                ItemSeparatorComponent = {this.FlatListItemSeparator}
-                renderItem={this._renderList}
-                keyExtractor={item => item.address}
-                />
-            </View>
-            <View style={styles.footer}>
-                <TouchableOpacity activeOpacity={.5} onPress={()=>this.props.navigation.navigate('UpdateImagePage')} keyboardShouldPersistTaps={true}>
-                    <View style={styles.button}>
-                        <Image style = {styles.iconAdd} source= {add} />
-                    </View>   
-                </TouchableOpacity>
-            </View>
-        </View>
-        );
-    }
-    else {
-        if(this.state.data.length === 0){
-            return (
-                <View style={ styles.background}>
-                    <StatusBar hidden={false}></StatusBar>
-                    <HeaderNavigation {...this.props}></HeaderNavigation>
-                    {/* <Text style={styles.h2text}> Job </Text> */}
-                    <Text style = {styles.text}> No Job!~ </Text>
+                <View style = {styles.Container}>
+                {
+                    this.state.data ? 
+                    <FlatList
+                    data={this.state.data}
+                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    renderItem={this._renderList}
+                    keyExtractor={item => item.id}
+                    ListHeaderComponent = {this.renderHeader}
+
+                    /> : <Text style = {styles.text}> No Request!~ </Text>
+                }
                 </View>
+                <View style={styles.footer}>
+                    <TouchableOpacity activeOpacity={.5} onPress={()=>this.props.navigation.navigate('UpdateImagePage')} keyboardShouldPersistTaps={true}>
+                        <View style={styles.button}>
+                            <Image style = {styles.iconAdd} source= {add} />
+                        </View>   
+                    </TouchableOpacity>
+                </View>
+            </View>
             );
         }
-        else return(
-        <View style={ styles.background}>
-            <StatusBar hidden={false}></StatusBar>
-            <HeaderNavigation {...this.props}></HeaderNavigation>
-            <View style = {styles.Container}>
-                <FlatList
-                data={this.state.data}
-                ItemSeparatorComponent = {this.FlatListItemSeparator}
-                renderItem={this._renderList}
-                keyExtractor={item => item.address}
-                />
+        else {
+         return(
+            <View style={ styles.background}>
+                <StatusBar hidden={false}></StatusBar>
+                <HeaderNavigation {...this.props}></HeaderNavigation>
+                <View style = {styles.fuilter}>
+                    <View style = {styles.viewPicker}>
+                        <Picker
+                            selectedValue = {this.state.value}
+                            style = {styles.combobox}
+                            onValueChange = {this._seachStatus.bind(this)}
+                        >
+                        {
+                            this.state.status.map((item,index) => {
+                                return <Picker.Item key = {index} label={item.name} value = {item.name} />
+                            })
+                        }
+                        </Picker>
+                    </View>
+                    <View style = {styles.viewPicker}>
+                        <Picker
+                            selectedValue = {this.state.supervisorName}
+                            style = {styles.combobox}
+                            onValueChange = {this._seachSupervisor.bind(this)}
+                        >
+                        {
+                            this.state.dataName.map((item,index) => {
+                                return <Picker.Item key = {index} label={`${item.supervisorLastName} ${item.supervisorFirstName}`} value = {`${item.supervisorFirstName} ${item.supervisorLastName}`} />
+                            })
+                        }
+                        </Picker>
+                    </View>
+                </View>
+                <View style = {[styles.Container]}>
+                {
+                    this.state.data ?
+                    <FlatList
+                    data={this.state.data}
+                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    renderItem={this._renderList}
+                    keyExtractor={item => item.id}
+                    ListHeaderComponent = {this.renderHeader}
+
+                    />:<Text style = {styles.text}>No Job</Text>
+                }
+                </View>
             </View>
-        </View>
-        );
-    }
-  } 
+            );
+            }
+        }
+    } 
 }
  
 const styles = StyleSheet.create({
@@ -265,9 +416,9 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height:  Dimensions.get('window').height,
         flex: 1,
-        alignItems: 'flex-start',
         justifyContent: 'center',
-        paddingLeft: 10
+        paddingLeft: 10,
+        paddingTop: (Platform.OS === 'ios')?20:0
     },
   footer: {
     position: 'absolute',
@@ -300,6 +451,7 @@ const styles = StyleSheet.create({
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
+    marginRight:10
     },
   icon:{
     width:100,
@@ -374,12 +526,12 @@ buttonAd:{
 
   },
   combobox: {
-    backgroundColor: '#848484',
+    backgroundColor: '#F0EEEE',
     height: 36,
     flex:1,
     paddingHorizontal: 5,
-    alignItems: 'center',
-    justifyContent: 'center'
+    marginRight: 10,
+    marginLeft: 10,
   },
   text: {
       textAlign: "center",
@@ -401,5 +553,24 @@ buttonAd:{
   icon1: {
     width: 25,
     height: 25
-}
+},
+    seach: {
+        marginTop: 10,
+    },
+    fuilter:{
+        backgroundColor: '#FAFAFA',
+        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: "center"
+    },
+    viewPicker:{
+        borderRadius: 5, 
+        borderWidth: 1, 
+        borderColor: 'gray',
+        flex: 1, 
+        justifyContent: 'center' ,
+        marginLeft: 10, 
+        marginRight: 10,
+        height: 40
+    }
 });

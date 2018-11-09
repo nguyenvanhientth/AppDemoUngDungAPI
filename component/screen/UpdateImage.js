@@ -35,7 +35,7 @@ export default class App extends Component {
   static navigationOptions = {
     title: 'Create Request',
     headerStyle: {
-      backgroundColor: '#1583F8',
+      backgroundColor: '#29ACE4',
     },
     headerTintColor: '#fff',
     headerTitleStyle: {
@@ -200,7 +200,7 @@ export default class App extends Component {
       return (
           <View style= {[styles.container]}>
           <ScrollView>
-            <View style={{flex:1, paddingTop: 10}}>
+            <View style={{flex:1, paddingTop: 10, alignItems: 'center'}}>
               <ScrollView horizontal = {true}>
                 {this.state.image ? this.renderAsset(this.state.image) : null}
                 {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}

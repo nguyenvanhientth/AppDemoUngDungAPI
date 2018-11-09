@@ -13,7 +13,7 @@ export default class CreateCompany extends Component {
     static navigationOptions = {
         title: 'Create Company',
         headerStyle: {
-            backgroundColor: '#1583F8',
+            backgroundColor: '#29ACE4',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {

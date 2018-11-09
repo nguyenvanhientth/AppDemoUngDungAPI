@@ -21,7 +21,7 @@ class ChanePassword extends Component {
             fontWeight: 'bold',
           },
           drawerIcon: ({icon}) =>(
-            <Image source = {change} resizeMode="contain" style = {[styles.icon1,{headerTintColor:icon}]} />
+            <Image source = {change} resizeMode="contain" style = {styles.icon1} />
         )
       };
       constructor(props) {

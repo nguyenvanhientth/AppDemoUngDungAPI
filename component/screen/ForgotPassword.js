@@ -11,7 +11,7 @@ class ForgotPassword extends Component {
     static navigationOptions = {
         title: 'Forgot PassWord',
         headerStyle: {
-            backgroundColor: '#1583F8',
+            backgroundColor: '#29ACE4',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
