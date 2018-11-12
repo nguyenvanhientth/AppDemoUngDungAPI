@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Image,Text,View,StyleSheet,TextInput,TouchableOpacity,AsyncStorage,StatusBar, 
-    ScrollView,Dimensions} from 'react-native';
+    ScrollView,ToastAndroid} from 'react-native';
 import env from '../environment/env';
 import HeaderNavigation from './header/HeaderNavigation';
 
@@ -74,9 +74,9 @@ class ChanePassword extends Component {
                   if (res.ok) {
                       var {navigate} = this.props.navigation;
                       navigate('Main');
-                      alert('ChanePassword Success!');
+                      ToastAndroid.show('Change Success!', ToastAndroid.CENTER);
                   } else {
-                      alert('ChanePassword False!')
+                    ToastAndroid.show('Change False!', ToastAndroid.CENTER);
                   }
               })
               .catch((err) => {

@@ -67,10 +67,10 @@ export default class CreateCompany extends Component {
                           if(responseJSON.ok){
                               var { navigate } = this.props.navigation;
                               navigate('drawerStack');
-                              alert('Create Success!');
+                              ToastAndroid.show('Create Success!', ToastAndroid.CENTER);
                           }
                           else {
-                              alert('Create False!');
+                            ToastAndroid.show('Create False!', ToastAndroid.CENTER);                              
                           }
                           
                   })

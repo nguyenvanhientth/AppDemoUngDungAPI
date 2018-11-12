@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet,Text,View,Image,ScrollView,AsyncStorage,TouchableOpacity,
-    ActivityIndicator} from 'react-native';
+    ActivityIndicator,ToastAndroid} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
@@ -133,10 +133,10 @@ export default class Request extends Component{
                   //console.warn(responseJSON);
                     if(responseJSON.ok){
                         this.props.navigation.navigate('drawerStack');
-                        alert('Reqair Success!');
+                        ToastAndroid.show('Reqair Success!', ToastAndroid.CENTER);
                     }
                     else {
-                        alert('Reqair False!');
+                        ToastAndroid.show('Reqair False!', ToastAndroid.CENTER);
                     }
                     
                 })

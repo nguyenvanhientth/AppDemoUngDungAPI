@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import {AppRegistry,StyleSheet,Text,View,Image,ScrollView,
-    AsyncStorage,TouchableOpacity,StatusBar,Picker} from 'react-native';
+import {StyleSheet,Text,View,Image,ScrollView,ToastAndroid,
+    AsyncStorage,TouchableOpacity,StatusBar,NativeModules} from 'react-native';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import env from '../environment/env';
 import Dialog from "react-native-dialog";
@@ -11,15 +11,15 @@ import HeaderNavigation from './header/HeaderNavigation';
 var STORAGE_KEY = 'key_access_token';
 const update = require('../image/update.png') ;
 const date = require('../image/date.png') ;
-const Male = require('../image/male.png') ;
-const Female = require('../image/female.png') ;
 const image = require('../image/image.png') ;
 const phone = require('../image/phone.png') ;
 const address = require('../image/address.png') ;
 const email = require('../image/email.png') ;
 const role = require('../image/role.png') ;
 const information = require('../image/information.png') ;
+var avatar = require('../image/avatar.png');
 const BASE_URL = env;
+var ImagePicker = NativeModules.ImageCropPicker;
 
 export default class Information extends Component {
     static navigationOptions = {
@@ -51,7 +51,8 @@ export default class Information extends Component {
       Address1: null,
       PhoneNumber1: null,
       isDateTimePickerVisible: false,
-      avatar: ''
+      avatar: null,
+      source: avatar
     };
   }
   
@@ -78,15 +79,14 @@ export default class Information extends Component {
                     Position: resJson.role,
                     PhoneNumber: resJson.phoneNumber,
                     DOB: resJson.dateOfBirth,
-                    Gender: resJson.gender
+                    Gender: resJson.gender,
+                    avatar: resJson.avatar
                 }); 
-                if (this.state.Gender === 'Female') {
-                    this.setState({avatar: Female})
+                if (this.state.avatar === undefined) {
+                    
                 } else {
-                    this.setState({
-                        avatar: Male
-                    })
-                }      
+                    
+                }
             })
             .catch ((error) => {
                 console.warn('AsyncStorage error:' + error.message);
@@ -158,10 +158,10 @@ export default class Information extends Component {
                       console.warn('signup',responseJSON)
                           if(responseJSON.ok){
                               this.componentWillMount();
-                              alert('Update Success!');
+                              ToastAndroid.show('Update Success!', ToastAndroid.CENTER);
                           }
                           else {
-                              alert('Update False!');
+                              ToastAndroid.show('Update False!', ToastAndroid.LONG);
                           }
                           
                   })
@@ -184,6 +184,27 @@ export default class Information extends Component {
     _show =() =>{
         alert(this.state.Email)
     }
+    pickMultiple() {
+        ImagePicker.openPicker({
+          multiple: true,
+          waitAnimationEnd: false,
+          includeExif: true,
+          forceJpg: true,
+        }).then(images => {
+          this.setState({
+            source:{uri: images.path, width: images.width, height: images.height, mime: images.mime}
+            });
+            console.warn('image', this.state.source)
+          })
+          .catch(e => alert(e));
+      }
+      renderImage(image) {
+        return <Image style={{width: 200, height: 200, resizeMode: 'contain',marginLeft: 10}} source={image} />
+      }
+    
+      renderAsset(image) {
+        return this.renderImage(image);
+      }
  render() {
     const { isDateTimePickerVisible, DOB1 } = this.state;
         return (
@@ -193,7 +214,13 @@ export default class Information extends Component {
                 <View style = {styles.contentName}>
                     <Text style = {{color: "#fff", fontSize: 30}}> Hi {this.state.firstName} {this.state.lastName}</Text>
                     <Text style = {{color: "#fff", fontSize: 20}}>Active | {this.state.Gender} | Born {this.state.DOB}</Text>
-                        <TouchableOpacity><Image source = {this.state.avatar} style = {{width: 100,height: 100,borderRadius: 100, margin: 10}} /></TouchableOpacity>
+                        <TouchableOpacity onPress = {() =>this.pickMultiple()}>
+                        {
+                            this.state.avatar ? 
+                            <Image style = {{width: 100,height: 100,borderRadius: 100, margin: 10}} source={{uri: this.state.avatar}} /> :
+                            <Image style = {{width: 100,height: 100,borderRadius: 100, margin: 10}} source={this.state.source} />
+                        }
+                        </TouchableOpacity>
                     <View style = {{flexDirection: 'row'}}>
                         <TouchableOpacity onPress = {()=>Communications.phonecall(this.state.PhoneNumber,true)}>
                             <Image source = {phone} style = {{width: 25,height: 25,margin: 10}} />
@@ -299,7 +326,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   text1: {
-    color: 'black',
+    color: 'gray',
     fontSize: 20,
     textAlign: 'center',
     marginLeft: 15

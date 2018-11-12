@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-start',
       flex: 1,
       flexDirection: 'row',
-      backgroundColor: '#CECEF6',
       paddingRight: 100,
       paddingTop: 15,
       paddingBottom: 15

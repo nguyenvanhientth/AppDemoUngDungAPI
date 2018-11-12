@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, StyleSheet, AsyncStorage } from 'react-native';
 import { DrawerItems } from 'react-navigation';
-import profileIcon from './image/ic_user.png';
 import env from './environment/env';
 const logout = require('./image/logout.png');
 
 var STORAGE_KEY = 'key_access_token';
 const BASE_URL = env;
+var avatar = require('./image/avatar.png');
 export default class SiderBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
             firstName:'',
-            lastName: ''
+            lastName: '',
+            avatar: null
         }
     }
     componentWillMount() {
@@ -32,7 +33,8 @@ export default class SiderBar extends Component {
                     this.setState({
                         firstName: resJson.firstName,
                         lastName: resJson.lastName,
-                    });       
+                        avatar: resJson.avatar,
+                    });     
                 })
                 .catch ((error) => {
                     console.warn('AsyncStorage error:' + error.message);
@@ -42,13 +44,16 @@ export default class SiderBar extends Component {
             console.log('AsyncStorage error: ' + error.message);
             }            
       }
-
     render(){
         const props = this.props;
         return (
             <View style={styles.container}>
                 <View style={styles.profileContainer}>
-                    <Image source={profileIcon}></Image>
+                {
+                    this.state.avatar ? 
+                    <Image style = {{width: 70, height: 70, borderRadius: 60}} source={{uri: this.state.avatar}} /> :
+                    <Image style = {{width: 70, height: 70, borderRadius: 60}} source={avatar} />
+                }
                     <Text style={styles.userInfoText}>Hi {this.state.lastName} {this.state.firstName}</Text>
                 </View>
                 <View>
@@ -78,6 +83,7 @@ const styles = StyleSheet.create({
     profileContainer:{
         backgroundColor: '#29ACE4', 
         alignItems: 'center', 
+        justifyContent: 'center',
         padding: 20
     },
     userInfoText:{

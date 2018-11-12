@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,TextInput,View,TouchableOpacity,
+import {StyleSheet,Text,TextInput,View,TouchableOpacity,ToastAndroid,
   Image,AsyncStorage, ScrollView,Dimensions,NativeModules} from 'react-native';
 import env from '../environment/env';
 
@@ -71,10 +71,10 @@ export default class EditCompany extends Component {
                           if(responseJSON.ok){
                               var { navigate } = this.props.navigation;
                               navigate('drawerStack');
-                              alert('Edit Success!');
+                              ToastAndroid.show('Edit Success!', ToastAndroid.CENTER);
                           }
                           else {
-                              alert('Edit False!');
+                            ToastAndroid.show('Edit False!', ToastAndroid.CENTER);
                           }
                           
                   })

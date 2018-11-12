@@ -19,8 +19,8 @@ import finish from './component/screen/finish';
 import CreateCompany from './component/screen/CreateCompany';
 import EditCompany from './component/screen/EditCompany';
 import SiderBar from './component/SiderBar';
+import ListUser from './component/screen/ListUser';
 
-const menuIcon = require('./component/image/menuIcon.png') ;
 const NavigationProfile = (props) => (
   <SiderBar {...props}></SiderBar>
 )
@@ -81,6 +81,7 @@ const MyApp = createStackNavigator({
   SignUpPage:{screen: SignUpPage},
   MapsPage: {screen: maps},
   ListCompanyPage: {screen: ListCompany},
+  ListUserPage:{screen: ListUser},
   CheckedPage: {screen: SelectedRequest},
   FinishPage: {screen: finish},
   CreateCompanyPage: {screen: CreateCompany },

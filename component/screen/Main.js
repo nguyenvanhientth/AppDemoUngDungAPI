@@ -172,15 +172,6 @@ export default class Main extends Component {
           />
         );
       }
-    _onPressLogOut () {
-        try {
-             AsyncStorage.removeItem(STORAGE_KEY);
-             var { navigate } = this.props.navigation;
-             navigate('LoginPage');
-         } catch (error) {
-             console.log('AsyncStorage error: ' + error.message);
-         }   
-     }
     status = (status) =>{
         if(status === 'Waiting'){
           return <Image style = {styles.status} source = {waiting}/>
@@ -291,7 +282,7 @@ export default class Main extends Component {
                                 <Text style = {styles.textAd}> List Company </Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {this._onPressLogOut.bind(this)} keyboardShouldPersistTaps={true}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('ListUserPage')} keyboardShouldPersistTaps={true}>
                             <View style = {[styles.buttonAd,{backgroundColor:'#BEDB6E'}]}>
                                 <View style={styles.iconWrap}>
                                     <Image source = {addCompany} style = {styles.icon}/>

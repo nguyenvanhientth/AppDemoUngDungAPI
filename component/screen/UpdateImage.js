@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, ScrollView, TextInput,Picker,
-  Image, TouchableOpacity, NativeModules, Dimensions, AsyncStorage
+  Image, TouchableOpacity, NativeModules, ToastAndroid, AsyncStorage
 } from 'react-native';
 import env from '../environment/env';
 // import { PermissionsAndroid } from 'react-native';
@@ -28,7 +28,9 @@ const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
 const company = require('../image/company.png') ;
 const map = require('../image/map.jpg') ;
-const submit = require('../image/submit.gif') ;
+const submit = require('../image/submit.gif');
+const camera = require('../image/camera.png');
+const photo = require('../image/photoLibrary.png');
 
 
 export default class App extends Component {
@@ -182,10 +184,10 @@ export default class App extends Component {
         if(res.ok){
           var { navigate } = this.props.navigation;
           navigate('drawerStack');
-          alert('Request Success!');
+          ToastAndroid.show('Request Success!', ToastAndroid.CENTER);
         }
           else {
-            alert('Request False!');debugger;
+            ToastAndroid.show('Update False!', ToastAndroid.CENTER);
         }
       })
       .catch((err) => {
@@ -206,14 +208,6 @@ export default class App extends Component {
                 {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
               </ScrollView>
             </View>
-              <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} keyboardShouldPersistTaps={true}>
-                <View style={[styles.button,{backgroundColor:"#d73352",}]}>
-                  <Text style={styles.buttonText}> Select image camera</Text>
-                </View>  
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={[styles.button,{backgroundColor:"#d73352",}]}>
-                <Text style={styles.buttonText}>Select Multiple</Text>
-              </TouchableOpacity>
             <View style={styles.inputWrap}>
                 <TextInput  style={styles.input} placeholder="Content" onChangeText={(content) => this.setState({content})} underlineColorAndroid="transparent"/>
             </View>
@@ -224,7 +218,6 @@ export default class App extends Component {
                 <View style={styles.iconWrap}>
                     <Image source={company} resizeMode="contain" style={styles.icon}/>
                 </View>
-                <Text style = {styles.label}> Company </Text>
                 <Picker
                     selectedValue={this.state.company}
                     style={styles.combobox}
@@ -235,6 +228,18 @@ export default class App extends Component {
                         })
                     }
                 </Picker>
+            </View>
+            <View style = {{flexDirection: 'row', alignItems: 'center',alignContent: 'center', justifyContent: 'center'}}>
+            <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} keyboardShouldPersistTaps={true}>
+              <View style={[styles.button]}>
+                <Image style = {styles.camera} resizeMode="contain" source = {camera} />
+              </View>  
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+              <View style={[styles.button]}>
+                <Image style = {styles.camera} resizeMode="contain" source = {photo}/>
+              </View>
+            </TouchableOpacity>
             </View>
             <View style={{flex:0.5, paddingTop: 10}}></View>
             </ScrollView>
@@ -258,20 +263,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     backgroundColor: '#E0F7FE',
-    width: Dimensions.get('window').width,
-    height:  Dimensions.get('window').height,
   },
   view: {
     flex: 1
   },
   button:{
-    paddingVertical: 8,
-    marginVertical: 5,
-    alignItems: "center",
-    justifyContent: "center",
     borderRadius: 30,
-    marginLeft: 30,
-    marginRight: 30
+    margin: 30
 },
 inputWrap:{
   flexDirection:"row",
@@ -286,10 +284,9 @@ input:{
   paddingHorizontal: 5,
   backgroundColor:'#FFF',
   },
-buttonText: {
-  fontSize: 16,
-  color:'#FFFFFF',
-  textAlign: 'center',   
+camera: {
+  width: 50, 
+  height: 50,  
 },
   footer: {
     position: 'absolute',
