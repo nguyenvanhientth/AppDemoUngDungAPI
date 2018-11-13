@@ -5,7 +5,7 @@ import env from '../environment/env';
 
 const BASE_URL = env;
 const time = require('../image/timeRequest.png');
-const address = require('../image/address.jpg');
+const address = require('../image/address.png');
 var STORAGE_KEY = 'key_access_token';
 
 export default class Request extends Component{

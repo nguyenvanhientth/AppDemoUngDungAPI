@@ -52,7 +52,8 @@ export default class Information extends Component {
       PhoneNumber1: null,
       isDateTimePickerVisible: false,
       avatar: null,
-      source: avatar
+      source: avatar,
+      updateAvata: false
     };
   }
   
@@ -128,6 +129,12 @@ export default class Information extends Component {
             dialogUpdate: false,
         })
     }
+    handleCancelAvatar =()=>{
+        this.setState({
+            updateAvata: false,
+            source: avatar
+        })
+    }
     handleUpdate = ()=>{
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;  
@@ -162,11 +169,10 @@ export default class Information extends Component {
                           }
                           else {
                               ToastAndroid.show('Update False!', ToastAndroid.LONG);
-                          }
-                          
+                          }      
                   })
                   .catch((error) => {
-                      console.warn('asd',error);
+                      console.warn('Error Update',error);
                   });  
           })
         this.setState({
@@ -186,24 +192,51 @@ export default class Information extends Component {
     }
     pickMultiple() {
         ImagePicker.openPicker({
-          multiple: true,
+          multiple: false,
           waitAnimationEnd: false,
           includeExif: true,
           forceJpg: true,
         }).then(images => {
-          this.setState({
-            source:{uri: images.path, width: images.width, height: images.height, mime: images.mime}
+            this.setState({
+              source: {uri: images.path, width: images.width, height: images.height, mime: images.mime}
             });
-            console.warn('image', this.state.source)
-          })
-          .catch(e => alert(e));
+        }).catch(e => alert(e));
+        this.setState({
+            updateAvata: true
+        })
       }
-      renderImage(image) {
-        return <Image style={{width: 200, height: 200, resizeMode: 'contain',marginLeft: 10}} source={image} />
-      }
-    
-      renderAsset(image) {
-        return this.renderImage(image);
+      handleOk = ()=>{
+        AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+            let token = user_data_json;
+            let url = BASE_URL + 'Account/UpdateAvatar';
+            let data = new FormData();
+            const sessionId = new Date().getTime();
+            data.append("FileAvatar",{
+                uri: this.state.source.uri,
+                type: 'image/jpg',
+                name: `${sessionId}.jpg`,
+            });
+            fetch(url,{
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: 'Bearer '+token,
+                },
+                body: data
+            })
+            .then((response) =>{
+                if(response.ok){
+                    ToastAndroid.show('Update Avatar Success!', ToastAndroid.CENTER);
+                }
+                else{
+                    ToastAndroid.show('Update Avatar False!', ToastAndroid.CENTER);
+                }
+            })
+            .catch((error) =>{
+                console.warn('Update Avatar Error!', error);
+            })
+        })
+        this.setState({updateAvata: false})
       }
  render() {
     const { isDateTimePickerVisible, DOB1 } = this.state;
@@ -283,6 +316,11 @@ export default class Information extends Component {
                         <Dialog.Button label="Ok" onPress={this.handleUpdate} />
                     </View>
                 </ScrollView>
+                </Dialog.Container>
+                <Dialog.Container visible = {this.state.updateAvata}>
+                    <Dialog.Title> You are want change Avatar! </Dialog.Title>
+                    <Dialog.Button label="Cancel" onPress={this.handleCancelAvatar} />
+                    <Dialog.Button label="Ok" onPress={this.handleOk} />
                 </Dialog.Container>
             </View>
         );
