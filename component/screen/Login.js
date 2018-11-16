@@ -113,7 +113,7 @@ export default class Login extends Component {
       return (
         <ScrollView horizontal={false}>
           <View style={ styles.background}>
-              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',marginTop: 20}}>
               <Image
                   style={{width: 350, height: 350, }}
                   source={logo}
