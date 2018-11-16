@@ -11,14 +11,15 @@ const logo = require('../image/forgot.png');
 class ForgotPassword extends Component {
    
     static navigationOptions = {
-        title: 'Forgot Password',
-        headerStyle: {
-        backgroundColor: '#29ACE4',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-        fontWeight: 'bold',
-        },
+        header: null
+        // title: 'Forgot Password',
+        // headerStyle: {
+        // backgroundColor: '#29ACE4',
+        // },
+        // headerTintColor: '#fff',
+        // headerTitleStyle: {
+        // fontWeight: 'bold',
+        // },
       };
       constructor(props) {
         super(props);
@@ -117,7 +118,7 @@ class ForgotPassword extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={.5} onPress={() => navigate('LoginPage')}>
                         <View >
-                        <Text style={styles.cancle}> Cancel! </Text>        
+                        <Text style={styles.cancle}> Go back login! </Text>        
                         </View>      
                     </TouchableOpacity> 
                 </View>  
