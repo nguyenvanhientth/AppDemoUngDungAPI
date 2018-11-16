@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView, TextInput,Picker,
+import {View, Text, StyleSheet, ScrollView, TextInput,Picker,ActivityIndicator,
   Image, TouchableOpacity, NativeModules, ToastAndroid, AsyncStorage
 } from 'react-native';
 import env from '../environment/env';
@@ -57,6 +57,7 @@ export default class App extends Component {
       longitude: this.props.navigation.getParam('long'),
       data:[],
       mapRegion: null,
+      loading: false
     };
   }
 
@@ -145,11 +146,13 @@ export default class App extends Component {
     return this.renderImage(image);
   }
   Upload = () => {
+    this.setState({loading: true});
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
       let token = user_data_json;   
       if(token === undefined){
         var { navigate } = this.props.navigation;
         navigate('LoginPage');
+        this.setState({loading: false});
        }    
       let url = BASE_URL + 'Request/InsertRequest';
       let data = new FormData();
@@ -182,15 +185,18 @@ export default class App extends Component {
       .then((res) => {
         //console.warn(res); 
         if(res.ok){
+          this.setState({loading: false});
           var { navigate } = this.props.navigation;
           navigate('drawerStack');
           ToastAndroid.show('Request Success!', ToastAndroid.CENTER);
         }
           else {
+            this.setState({loading: false});
             ToastAndroid.show('Update False!', ToastAndroid.CENTER);
         }
       })
       .catch((err) => {
+        this.setState({loading: false});
         console.warn(' loi update image',err);
       })
     })
@@ -199,6 +205,13 @@ export default class App extends Component {
     this.setState({company: id})
 }
   render() {
+    if (this.state.loading) {
+      return(
+          <View style = {styles.background}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )
+  } else {
       return (
           <View style= {[styles.container]}>
           <ScrollView>
@@ -255,6 +268,7 @@ export default class App extends Component {
             </View>
         </View>
       );
+    } 
   }
 }
 

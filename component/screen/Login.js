@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,
-    Image,AsyncStorage,ImageBackground,ScrollView,Dimensions} from 'react-native';
+    Image,AsyncStorage,ActivityIndicator,ScrollView,Dimensions} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
@@ -12,22 +12,24 @@ const logo = require('../image/logo.png');
 
 export default class Login extends Component {
   static navigationOptions = {
-    headerMode: 'none',
-    title: 'Login',
-    headerStyle: {
-      backgroundColor: '#29ACE4',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      fontWeight: 'bold',
-    },
-    headerLeft: null
+    header: null,
+    // headerMode: 'none',
+    // title: 'Login',
+    // headerStyle: {
+    //   backgroundColor: '#29ACE4',
+    // },
+    // headerTintColor: '#fff',
+    // headerTitleStyle: {
+    //   fontWeight: 'bold',
+    // },
+    // headerLeft: null
   };
   constructor(props) {
     super(props);
     this.state = {
       userNames: '',
       passwords: '',
+      loading: false,
     };
   }
   componentDidMount(){
@@ -48,6 +50,7 @@ export default class Login extends Component {
         alert('Ban chua nhap day du! ')
       }
       else{
+        this.setState({loading: true})
         // let postData = new FormData();
         // postData.append('UserName',userName);
         // postData.append('PassWord',password);   
@@ -72,17 +75,21 @@ export default class Login extends Component {
                if(access_token !=undefined){
                           try {
                               AsyncStorage.setItem(STORAGE_KEY, access_token);
+                              this.setState({loading:false})
                                 navigate('drawerStack');
                             } catch (error) {
                               console.log('AsyncStorage error: ' + error.message);
+                              this.setState({loading:false})
                             }    
                }
                else{
+                  this.setState({loading:false})
                   Alert.alert('Login failure');
                }  
           })
           .catch((error) => {
             Alert.alert('Login failure');
+            this.setState({loading:false})
             //console.warn('asdsad',error);
           }); 
       }
@@ -96,44 +103,52 @@ export default class Login extends Component {
   }
   render() {
      var { navigate } = this.props.navigation;
-    return (
-      <ScrollView horizontal={false}>
-        <View style={ styles.background}>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Image
-                style={{width: 350, height: 350, }}
-                source={logo}
-                resizeMode = 'center'
-                />
-            </View>
-              <View style={styles.wrapper}>
-                <View style={styles.inputWrap}>
-                    <View style={styles.iconWrap}>
-                        <Image source={userIcon} resizeMode="contain" style={styles.icon}/>
-                    </View>
-                    <TextInput  style={styles.input} placeholder="Username" onChangeText={this._onChaneText.bind(this)} underlineColorAndroid="transparent"/>
-                </View>
-                <View style={styles.inputWrap}>
-                    <View style={styles.iconWrap}>
-                        <Image source={lockIcon} resizeMode="contain" style={styles.icon}/>
-                    </View>
-                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}  onChangeText={this._onChanePassWord.bind(this)} underlineColorAndroid="transparent"/>
-                </View>
-                <TouchableOpacity activeOpacity={.5} onPress={this._onPressLogin.bind(this)} keyboardShouldPersistTaps={true}>
-                    <View style={styles.button}>
-                        <Text style={styles.buttonText}> Login</Text>
-                    </View>      
-                </TouchableOpacity>
-                <TouchableOpacity  activeOpacity={.5} onPress={() => navigate('ForgotPassPage')}>
-                    <View >
-                    <Text style={styles.forgotPasswordText}>Forgot password?</Text>        
-                    </View>      
-                </TouchableOpacity> 
-            </View>   
-          <View style = {styles.container} />                     
-      </View>
-      </ScrollView>
-    );
+     if (this.state.loading) {
+       return(
+          <View style = {[styles.background,{alignItems: 'center'}]}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )
+     } else {
+      return (
+        <ScrollView horizontal={false}>
+          <View style={ styles.background}>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Image
+                  style={{width: 350, height: 350, }}
+                  source={logo}
+                  resizeMode = 'center'
+                  />
+              </View>
+                <View style={styles.wrapper}>
+                  <View style={styles.inputWrap}>
+                      <View style={styles.iconWrap}>
+                          <Image source={userIcon} resizeMode="contain" style={styles.icon}/>
+                      </View>
+                      <TextInput  style={styles.input} placeholder="Username" onChangeText={this._onChaneText.bind(this)} underlineColorAndroid="transparent"/>
+                  </View>
+                  <View style={styles.inputWrap}>
+                      <View style={styles.iconWrap}>
+                          <Image source={lockIcon} resizeMode="contain" style={styles.icon}/>
+                      </View>
+                      <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}  onChangeText={this._onChanePassWord.bind(this)} underlineColorAndroid="transparent"/>
+                  </View>
+                  <TouchableOpacity activeOpacity={.5} onPress={this._onPressLogin.bind(this)} keyboardShouldPersistTaps={true}>
+                      <View style={styles.button}>
+                          <Text style={styles.buttonText}> Login</Text>
+                      </View>      
+                  </TouchableOpacity>
+                  <TouchableOpacity  activeOpacity={.5} onPress={() => navigate('ForgotPassPage')}>
+                      <View >
+                      <Text style={styles.forgotPasswordText}>Forgot password?</Text>        
+                      </View>      
+                  </TouchableOpacity> 
+              </View>   
+            <View style = {styles.container} />                     
+        </View>
+        </ScrollView>
+      );
+    }
   }
 }
 
@@ -190,6 +205,15 @@ const styles = StyleSheet.create({
     color:'#0404B4',
     backgroundColor:"transparent",
     textAlign: 'center',
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
   },
 });
 module.exports = Login;

@@ -1,2 +1,2 @@
-const url = 'http://192.168.82.28/TmanagerServer/api/'
+const url = 'http://14.165.110.151/api/'
 export default url;

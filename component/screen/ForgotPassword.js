@@ -1,28 +1,31 @@
 import React, { Component } from 'react';
-import {Image,Text,View,StyleSheet,TextInput,TouchableOpacity,ImageBackground,ScrollView,Dimensions} from 'react-native';
+import {Image,Text,View,StyleSheet,TextInput,TouchableOpacity,ActivityIndicator
+    ,ScrollView,Dimensions} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
 const EmailIcon = require('../image/email.png');
 const userIcon = require('../image/ic_user.png');
+const logo = require('../image/forgot.png');
 
 class ForgotPassword extends Component {
    
     static navigationOptions = {
-        title: 'Forgot PassWord',
+        title: 'Forgot Password',
         headerStyle: {
-            backgroundColor: '#29ACE4',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+        backgroundColor: '#29ACE4',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+        fontWeight: 'bold',
+        },
       };
       constructor(props) {
         super(props);
         this.state = {
           userNames: '',
           Email: '',
+          loading: false,
         };
       }
       _onChaneText = (userNames) => {
@@ -46,6 +49,7 @@ class ForgotPassword extends Component {
                 this.setState({Email:''})
             } 
             else {
+                this.setState({loading: true});
                 fetch(url,{
                     method: "POST",
                     headers: {
@@ -61,11 +65,14 @@ class ForgotPassword extends Component {
                     //console.warn(resJson);
                     if (resJson.ok) {
                         alert(`Yeu cau thanh cong! Ban vao email: ${Email} de lay mat khau moi!`);
+                        this.setState({loading: false});
                     } else {
+                        this.setState({loading: false});
                         alert('Request false! You checking!');
                     }
                 })
                 .catch((err) => {
+                    this.setState({loading: false});
                     console.log(err);
                 })
             }
@@ -73,39 +80,52 @@ class ForgotPassword extends Component {
       }
   render() {
     var { navigate } = this.props.navigation;
-    return (
-        <ScrollView>
-        <View style={styles.background}>
-            <View style={styles.container}/>
-            <View style={styles.wrapper}>
-                <View style={styles.inputWrap}>
-                    <View style={styles.iconWrap}>
-                        <Image source={userIcon} resizeMode="contain" style={styles.icon}/>
-                    </View>
-                    <TextInput  style={styles.input} placeholder="Username" onChangeText={this._onChaneText.bind(this)} underlineColorAndroid="transparent"/>
+    if (this.state.loading) {
+        return(
+            <View style = {styles.background}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          )
+    } else {
+        return (
+            <ScrollView>
+            <View style={styles.background}>
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <Image
+                        style={{width: 350, height: 350, }}
+                        source={logo}
+                        resizeMode = 'center'
+                        />
                 </View>
-                <View style={styles.inputWrap}>
-                    <View style={styles.iconWrap}>
-                        <Image source={EmailIcon} resizeMode="contain" style={styles.icon}/>
+                <View style={styles.wrapper}>
+                    <View style={styles.inputWrap}>
+                        <View style={styles.iconWrap}>
+                            <Image source={userIcon} resizeMode="contain" style={styles.icon}/>
+                        </View>
+                        <TextInput  style={styles.input} placeholder="Username" onChangeText={this._onChaneText.bind(this)} underlineColorAndroid="transparent"/>
                     </View>
-                    <TextInput style={styles.input} placeholder="gmail@gmail.com" textContentType = {"emailAddress"}  onChangeText={this._onChaneEmail.bind(this)} underlineColorAndroid="transparent"/>
-                </View>
-                <TouchableOpacity activeOpacity={.5} onPress={this._onPressForgot.bind(this)} keyboardShouldPersistTaps={true}>
-                    <View style={styles.button}>
-                        <Text style={styles.buttonText}> Request </Text>
-                    </View>      
-                </TouchableOpacity>
-                <TouchableOpacity activeOpacity={.5} onPress={() => navigate('LoginPage')}>
-                    <View >
-                    <Text style={styles.cancle}> Cancel! </Text>        
-                    </View>      
-                </TouchableOpacity> 
-            </View>  
-            <View style={styles.container}/>       
-       </View>
-       </ScrollView>
-    );
-  }
+                    <View style={styles.inputWrap}>
+                        <View style={styles.iconWrap}>
+                            <Image source={EmailIcon} resizeMode="contain" style={styles.icon}/>
+                        </View>
+                        <TextInput style={styles.input} placeholder="example@gmail.com" textContentType = {"emailAddress"}  onChangeText={this._onChaneEmail.bind(this)} underlineColorAndroid="transparent"/>
+                    </View>
+                    <TouchableOpacity activeOpacity={.5} onPress={this._onPressForgot.bind(this)} keyboardShouldPersistTaps={true}>
+                        <View style={styles.button}>
+                            <Text style={styles.buttonText}> Change Password </Text>
+                        </View>      
+                    </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={.5} onPress={() => navigate('LoginPage')}>
+                        <View >
+                        <Text style={styles.cancle}> Cancel! </Text>        
+                        </View>      
+                    </TouchableOpacity> 
+                </View>  
+                <View style={styles.container}/>       
+        </View>
+        </ScrollView>
+        );}
+    }
 }
 
 const styles = StyleSheet.create({
@@ -148,6 +168,7 @@ const styles = StyleSheet.create({
       marginVertical:8,
       alignItems: "center",
       justifyContent: "center",
+      borderRadius: 20,
       },
   
   
