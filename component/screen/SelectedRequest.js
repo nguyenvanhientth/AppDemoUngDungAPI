@@ -24,6 +24,7 @@ export default class Request extends Component{
         this.state = {
             images: [],
             id: this.props.navigation.getParam('id'),
+            status: this.props.navigation.getParam('status'),
             content:'',
             address:'',
             repairPersonId: '',
@@ -55,7 +56,6 @@ export default class Request extends Component{
                       address: resData.address,
                       repairPersonId: resData.timeBeginRequest,
                       selectImage: resData.pictureRequest[0],
-                      loadding:false
                     });
                     //console.warn('data',this.state.repairPersonId);
                 })
@@ -100,7 +100,8 @@ export default class Request extends Component{
                 .catch ((error) => {
                     console.warn('AsyncStorage error:' + error.message);
                 }) 
-            })
+                this.setState({loadding: false});
+            });
     }
     renderImage(image) {
         return <TouchableOpacity onPress = {()=>this.setState({selectImage: image})}><Image style={styles.image} source={{uri:image}} /></TouchableOpacity>
@@ -110,6 +111,7 @@ export default class Request extends Component{
         return this.renderImage(image);
     }
     _receive = () =>{
+        this.setState({loadding: true});
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;   
             if(token === undefined){
@@ -143,9 +145,13 @@ export default class Request extends Component{
                 .catch((err) => {
                     console.warn('Error: ',err);
                 })
+            this.setState({
+                loadding:false
+            });
         })
     }
     _finish = () =>{
+        this.setState({loadding: true});
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;   
             if(token === undefined){
@@ -179,6 +185,7 @@ export default class Request extends Component{
                 .catch((err) => {
                     console.warn('Error: ',err);
                 })
+            this.setState({loadding: false})
         })
     }
     render(){
@@ -189,58 +196,101 @@ export default class Request extends Component{
                 </View>
             )
         }else{
+
         if(this.state.Position !== "Supervisor"){
-            return (
-                <View style = {styles.container}>
+            if (this.state.status === "Waiting") {
+                return (
                     <ScrollView >
-                    <View style = {{paddingBottom: 20}}>
-                        <View style = {{alignItems: "center"}}>
-                            <Image style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, marginBottom: 10,
-                             borderRadius:10}} resizeMode = "contain" source = {{uri: this.state.selectImage}} />
-                        <ScrollView horizontal = {true} style = {{marginTop: 10, borderColor: 'gray', borderWidth: 1}}>
-                        {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
-                        </ScrollView>
+                    <View style = {styles.container}>
+                        <View style = {{paddingBottom: 20}}>
+                            <View style = {{alignItems: "center"}}>
+                                <Image style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, marginBottom: 10,
+                                 borderRadius:10}} resizeMode = "contain" source = {{uri: this.state.selectImage}} />
+                            <ScrollView horizontal = {true} style = {{marginTop: 10, borderColor: 'gray', borderWidth: 1}}>
+                            {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
+                            </ScrollView>
+                            </View>
+                            <Text style= {[styles.textTitle,{alignItems:'center'}]}> {this.state.content}</Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
                         </View>
-                        <Text style= {[styles.textTitle,{alignItems:'center'}]}> {this.state.content}</Text>
-                        <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
-                        <Text style={styles.textTitle}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
-                    </View>
-                    <View style={styles.footer}>
-                        <TouchableOpacity  onPress={this._receive.bind(this)} keyboardShouldPersistTaps={true} style = {{margin: 10}}>
-                            <Text style = {styles.button}>Receive</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style = {{margin:10}} activeOpacity={.5} onPress={()=>this.props.navigation.navigate('FinishPage',{id:this.state.id})} keyboardShouldPersistTaps={true}>
-                            <Text style = {styles.button}>Finish</Text>
-                        </TouchableOpacity>
-                    </View>
-                    </ScrollView>
-                </View>
-            )
+                        <View style={styles.footer}>
+                            <TouchableOpacity  onPress={this._receive.bind(this)} keyboardShouldPersistTaps={true} style = {{margin: 10}}>
+                                <Text style = {styles.button}>Receive</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View></ScrollView>
+                )
+            } else {
+                return (
+                    <ScrollView >
+                    <View style = {styles.container}>
+                        <View style = {{paddingBottom: 20}}>
+                            <View style = {{alignItems: "center"}}>
+                                <Image style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, marginBottom: 10,
+                                borderRadius:10}} resizeMode = "contain" source = {{uri: this.state.selectImage}} />
+                            <ScrollView horizontal = {true} style = {{marginTop: 10, borderColor: 'gray', borderWidth: 1}}>
+                            {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
+                            </ScrollView>
+                            </View>
+                            <Text style= {[styles.textTitle,{alignItems:'center'}]}> {this.state.content}</Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
+                        </View>
+                        <View style={styles.footer}>
+                            <TouchableOpacity style = {{margin:10}} activeOpacity={.5} onPress={()=>this.props.navigation.navigate('FinishPage',{id:this.state.id})} keyboardShouldPersistTaps={true}>
+                                <Text style = {styles.button}>Finish</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View></ScrollView>
+                )                
+            }
         }
         else {
-            return (
-                <View style = {styles.container}>
-                <ScrollView >
-                    <View style = {{paddingBottom: 20}}>
-                        <View style = {{alignItems: 'center'}}>
-                            <Image resizeMode = "contain" style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, borderRadius: 10, marginBottom: 10, 
-                                }} source = {{uri: this.state.selectImage}} />
-                            <ScrollView horizontal = {true} style = {{marginTop: 10,borderColor: 'gray', borderWidth: 1}}>
-                                {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
-                            </ScrollView>
+            if (this.state.status === "Done") {
+                return (
+                    <ScrollView >
+                    <View style = {styles.container}>
+                        <View style = {{paddingBottom: 20}}>
+                            <View style = {{alignItems: 'center'}}>
+                                <Image resizeMode = "contain" style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, borderRadius: 10, marginBottom: 10, 
+                                    }} source = {{uri: this.state.selectImage}} />
+                                <ScrollView horizontal = {true} style = {{marginTop: 10,borderColor: 'gray', borderWidth: 1}}>
+                                    {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
+                                </ScrollView>
+                            </View>
+                            <Text style= {[styles.textTitle,{alignItems:'center',justifyContent:'center'}]}> {this.state.content}</Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {time}/> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
                         </View>
-                        <Text style= {[styles.textTitle,{alignItems:'center',justifyContent:'center'}]}> {this.state.content}</Text>
-                        <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
-                        <Text style={styles.textTitle}><Image style = {styles.time} source = {time}/> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
+                        <View style={styles.footer}>
+                            <TouchableOpacity  onPress={this._finish.bind(this)} keyboardShouldPersistTaps={true}>
+                                <Text style = {styles.button}>Confirm</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                <View style={styles.footer}>
-                    <TouchableOpacity  onPress={this._finish.bind(this)} keyboardShouldPersistTaps={true}>
-                        <Text style = {styles.button}>Confirm</Text>
-                    </TouchableOpacity>
-                </View>
-                </ScrollView>
-                </View>
-                )
+                    </ScrollView>
+                    )
+            } else {
+                return (
+                    <ScrollView >
+                    <View style = {styles.container}>
+                        <View style = {{paddingBottom: 20}}>
+                            <View style = {{alignItems: 'center'}}>
+                                <Image resizeMode = "contain" style={{width: 300,height:300,justifyContent:'center',flex:1,alignItems:'center', marginTop: 10, borderRadius: 10, marginBottom: 10, 
+                                    }} source = {{uri: this.state.selectImage}} />
+                                <ScrollView horizontal = {true} style = {{marginTop: 10,borderColor: 'gray', borderWidth: 1}}>
+                                    {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
+                                </ScrollView>
+                            </View>
+                            <Text style= {[styles.textTitle,{alignItems:'center',justifyContent:'center'}]}> {this.state.content}</Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text> </Text>
+                            <Text style={styles.textTitle}><Image style = {styles.time} source = {time}/> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
+                        </View>
+                    </View>
+                    </ScrollView>
+                    )
+                }
             }
         }
     }

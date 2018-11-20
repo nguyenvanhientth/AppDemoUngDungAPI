@@ -63,7 +63,6 @@ class ForgotPassword extends Component {
                         })
                 })
                 .then((resJson) => {
-                    //console.warn(resJson);
                     if (resJson.ok) {
                         alert(`Yeu cau thanh cong! Ban vao email: ${Email} de lay mat khau moi!`);
                         this.setState({loading: false});

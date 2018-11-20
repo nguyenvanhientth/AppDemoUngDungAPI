@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,
-  Image,AsyncStorage,ImageBackground, ScrollView, Picker,Dimensions} from 'react-native';
+  Image,AsyncStorage,ActivityIndicator, ScrollView, Picker,Dimensions} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
@@ -32,6 +32,7 @@ export default class SignUpPage extends Component {
       data: [],
       gender: [{id:-1,name:'Select Gender'},{id: 0,name:'Nữ'},{id: 1,name: 'Nam'}],
       Sgender: -1,
+      loading: true,
     };
   }
 
@@ -59,10 +60,12 @@ export default class SignUpPage extends Component {
           .catch((err) => {
             console.warn(' loi update Area1',err);
           })
-        })
+        });
+        this.setState({loading: false});
     }
 
   _onPressSignUp = () => {
+      this.setState({loading: true});
       AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
       let token = user_data_json;  
       let serviceUrl = BASE_URL+  "Account/Register";
@@ -102,7 +105,8 @@ export default class SignUpPage extends Component {
             })
             .catch((error) => {
                 console.warn('asd',error);
-            });  
+            }); 
+        this.setState({loading: false}) ;
     })
 }
       
@@ -123,6 +127,13 @@ export default class SignUpPage extends Component {
     }
     render() {
         var { navigate } = this.props.navigation;
+        if (this.state.loading) {
+            return(
+                <View style = {styles.background}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              )
+        } else {
     return (
         <ScrollView>
         <View style={ styles.background}>
@@ -192,7 +203,7 @@ export default class SignUpPage extends Component {
             <View style={styles.container}/>
         </View>
         </ScrollView>
-    );
+    );}
   }
 }
 

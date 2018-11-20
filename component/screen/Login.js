@@ -4,7 +4,6 @@ import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,
 import env from '../environment/env';
 
 const BASE_URL = env;
-const background = require('../image/hinhnen.png') ;
 const lockIcon = require('../image/ic_lock.png');
 const userIcon = require('../image/ic_user.png');
 var STORAGE_KEY = 'key_access_token';
@@ -32,15 +31,7 @@ export default class Login extends Component {
       loading: false,
     };
   }
-  componentDidMount(){
-    try {
-      AsyncStorage.removeItem(STORAGE_KEY);
-      // var { navigate } = this.props.navigation;
-      // navigate('LoginPage');
-  } catch (error) {
-      console.log('AsyncStorage error: ' + error.message);
-    }   
-  }
+
   _onPressLogin = () => {
       let serviceUrl =  BASE_URL + "Account/login";
       let userName = this.state.userNames;
@@ -113,9 +104,9 @@ export default class Login extends Component {
       return (
         <ScrollView horizontal={false}>
           <View style={ styles.background}>
-              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',marginTop: 20}}>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',margin: 20}}>
               <Image
-                  style={{width: 350, height: 350, }}
+                  style={{width: '100%', height: '100%', }}
                   source={logo}
                   resizeMode = 'center'
                   />

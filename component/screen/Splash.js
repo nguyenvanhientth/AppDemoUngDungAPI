@@ -16,7 +16,7 @@ class SplashPage extends Component {
     var pageUrl='LoginPage';  // login show defaul
     try { 
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
-        let userData = JSON.parse(user_data_json);
+        let userData = JSON.stringify(user_data_json);
         if(userData != undefined){      
             pageUrl = 'drawerStack';
         }                        
@@ -34,7 +34,7 @@ class SplashPage extends Component {
     return (
         <View style={{flex: 1, backgroundColor: '#DAD4D4', alignItems: 'center', justifyContent: 'center'}}>
             <Image
-                style={{width: 350, height: 350, }}
+                style={{width: '100%', height: '100%', }}
                 source={logo}
                 resizeMode = 'center'
                 />

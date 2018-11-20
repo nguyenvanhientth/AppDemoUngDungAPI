@@ -1,5 +1,6 @@
 import  React, { Component } from 'react';
 import { View, Image, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import { DrawerActions } from 'react-navigation'
 import menuIcon from '../../image/menuIcon.png';
 
 export default class HeaderNavigation extends Component {
@@ -9,7 +10,7 @@ export default class HeaderNavigation extends Component {
         <View style={styles.headerContainer}>
             <TouchableOpacity style={styles.btnDrawer}
                 onPress={() => {
-                    this.props.navigation.openDrawer();
+                    this.props.navigation.dispatch(DrawerActions.openDrawer());
                 }}>
                 <Image style={{ width: 25, height: 25 }} source={menuIcon}/>
             </TouchableOpacity>

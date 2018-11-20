@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import {StyleSheet,Text,View,Image,Dimensions,ActivityIndicator,Platform,Picker,
     AsyncStorage,TouchableOpacity,StatusBar,FlatList,TextInput} from 'react-native';
-import env from '../environment/env';
 import HeaderNavigation from './header/HeaderNavigation';
+import helper from '../helper/helper';
 
 var STORAGE_KEY = 'key_access_token';
 const addUser = require('../image/addUser.png') ;
 const company = require('../image/company.png') ;
-const addCompany = require('../image/addCompany.png') ;
+const will = require('../image/willdo.png') ;
 const list = require('../image/list.png') ;
 const add = require('../image/add.png') ;
 const waiting = require('../image/waiting.png') ;
 const todo = require('../image/todo.png') ;
 const done = require('../image/done.png') ;
 const main = require('../image/home.png') ;
-const BASE_URL = env;
 
 export default class Main extends Component {
     static navigationOptions = {
@@ -37,12 +36,12 @@ export default class Main extends Component {
         dataName: [],
         company: '',
         supervisorName: '',
-        status: [{id:0, name: 'All Status'},{id:1, name: 'Waiting'},{id:2, name: 'To do'},{id:3, name: 'Done'},{id:4, name: 'Approved'},]
+        status: [{id:0, name: 'All Status'},{id:1, name: 'Waiting'},{id:2, name: 'To do'},{id:3, name: 'Done'},{id:4, name: 'Approved'},],
     };
     this.array = [];
   }
   
-  componentWillMount() {
+    componentWillMount () {
     try {
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;   
@@ -50,84 +49,42 @@ export default class Main extends Component {
               var { navigate } = this.props.navigation;
               navigate('LoginPage');
             }    
-            let url = BASE_URL + 'Request/GetRequest';
-            fetch(url,{
-                headers: {
-                  'cache-control': 'no-cache',
-                  Authorization: 'Bearer ' + token,
-                  },
-              })
-              .then((res) => res.json())
-              .then((resData) => { 
-                  this.setState({
-                      data : resData,
-                      loading: false,
-                    });
-                    //console.warn('data',this.state.data);
-                    this.array = resData
+//-----------get data async from helper----------------------
+            helper.getUser(token).then((data) => {
+                this.setState({
+                     Position: data.role,
                 })
-              .catch((err) => {
-                console.warn('Error',err);
-              });
-    //--------------------------------------------------------------------------
-              fetch(BASE_URL + "Account/GetUserInformation",{
-                //method: "GET",
-                headers:{ 
-                    'cache-control': 'no-cache',
-                    Authorization: 'Bearer ' + token,
-                    }
-                })
-                .then((res)=>res.json())
-                .then((resJson) => {
-                    //console.warn("resJson",resJson);debugger;
+            });
+//-----------------------------------------------------------
+            if (this.state.Position !== "Admin") {
+                helper.getRequest(token).then((data)=>{
                     this.setState({
-                        Position: resJson.role,
-                    });   
-                   // console.warn(this.state.Position)    
-                })
-                .catch ((error) => {
-                    console.warn('AsyncStorage error:' + error.message);
-                });
-    //-------------------------------------------------- ----------------------
-                fetch(BASE_URL + 'Company/GetAllCompany',{
-                    headers: {
-                    'cache-control': 'no-cache',
-                    Authorization: 'Bearer ' + token,
-                    },
-                })
-                .then((res) => res.json())
-                .then((resData) => { 
-                    this.setState({
-                        data1 : [{id: 0,name: 'All Company'},...resData]
-                        });
-                        //console.warn('data',this.state.data1);
+                        data: data,
                     })
-                .catch((err) => {
-                    console.warn('Get Company error',err);
-                })
-    //--------------------------------------------------------------------------------
-                fetch(BASE_URL + 'Account/GetSupervisor',{
-                    headers: {
-                    'cache-control': 'no-cache',
-                    Authorization: 'Bearer ' + token,
-                    },
-                })
-                .then((res) => res.json())
-                .then((resData) => { 
+                    this.array = data;
+                })        
+    //-----------------------------------------------------------
+                helper.getAllCompany(token).then(data => {
                     this.setState({
-                        dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...resData]
-                        });
-                        //console.warn('data',this.state.data1);
+                        data1: [{id: 0,name: 'All Company'},...data],
                     })
-                .catch((err) => {
-                    console.warn('Get Supervisor error',err);
                 })
-            })
-            //Get position        
-        } catch (error) {
-        console.log('AsyncStorage error: ' + error.message);
+    //-------------------------------------------------------------
+                helper.getSupervisor(token).then(data=> {
+                    this.setState({
+                        dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data]
+                        })
+                    })
+                }
+            }).then(() => this.setState({loading: false}))       
+        } 
+        catch (error) {
+            this.setState({loading: false});
+            console.log('AsyncStorage error: ' + error.message);
         }   
     }
+    
+//----------------------------------------------------------------------------------
     cutString = (string) =>{
         var n = string.length;
         var address  = '';
@@ -142,7 +99,7 @@ export default class Main extends Component {
     //----------------------------------------------------------------------------------------------
     _renderList = ({ item }) => {
         return (
-         <TouchableOpacity style={styles.flatview} onPress={()=>this.props.navigation.navigate('CheckedPage',{id: item.id})}>
+         <TouchableOpacity style={styles.flatview} onPress={()=>this.props.navigation.navigate('CheckedPage',{id: item.id, status: item.status})}>
             <Image style = {styles.anh} source= {{uri: item.pictureRequest[0]}}/>
             <View style = {styles.line}>
                 <Text style={styles.name} > {this.cutString(item.address)}</Text>
@@ -261,33 +218,29 @@ export default class Main extends Component {
                                 <View style={styles.iconWrap}>
                                     <Image source = {addUser} style = {styles.icon}/>
                                 </View>
-                                <Text style = {styles.textAd}> Create User </Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('CreateCompanyPage')} keyboardShouldPersistTaps={true}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('ListCompanyPage')} keyboardShouldPersistTaps={true}>
                             <View style = {[styles.buttonAd,{backgroundColor: '#B558E8'}]}>
                                 <View style={styles.iconWrap}>
                                     <Image source = {company} style = {styles.icon}/>
                                 </View>
-                                <Text style = {styles.textAd}> Create Company </Text>
                             </View>
                         </TouchableOpacity>
                     </View>
                     <View style = { styles.row}>
-                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {() =>this.props.navigation.navigate('ListCompanyPage')}  keyboardShouldPersistTaps={true}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {() =>alert('Will do')}  keyboardShouldPersistTaps={true}>
                             <View style = {[styles.buttonAd,{backgroundColor: '#6AC6E5'}]}>
                                 <View style={styles.iconWrap}>
-                                    <Image source = {list} style = {styles.icon}/>
+                                    <Image source = {will} style = {styles.icon}/>
                                 </View>
-                                <Text style = {styles.textAd}> List Company </Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('ListUserPage')} keyboardShouldPersistTaps={true}>
+                        <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>alert('Will do')} keyboardShouldPersistTaps={true}>
                             <View style = {[styles.buttonAd,{backgroundColor:'#BEDB6E'}]}>
                                 <View style={styles.iconWrap}>
-                                    <Image source = {addCompany} style = {styles.icon}/>
+                                    <Image source = {will} style = {styles.icon}/>
                                 </View>
-                                <Text style = {styles.textAd}> Company for User </Text>
                             </View>
                         </TouchableOpacity>
                     </View>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Image,Text,View,StyleSheet,TextInput,TouchableOpacity,AsyncStorage,StatusBar, 
-    ScrollView,ToastAndroid} from 'react-native';
+    ScrollView,ToastAndroid,ActivityIndicator} from 'react-native';
 import env from '../environment/env';
 import HeaderNavigation from './header/HeaderNavigation';
 
@@ -30,6 +30,7 @@ class ChanePassword extends Component {
           OldPassWord: '',
           NewPassword: '',
           ConPassword: '',
+          loading: false
         };
       }
       _onChaneOld = (OldPassWord) => {
@@ -45,10 +46,12 @@ class ChanePassword extends Component {
       }
       _onPressForgot = () => {
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+            this.setState({loading: true});
           let token = user_data_json;
           if (token === undefined) {
               var{navigate} = this.props.navigation;
               navigate('LoginPage');
+              this.setState({loading: false});
           }
           let passN = this.state.NewPassword;
           let passO = this.state.OldPassWord;
@@ -74,18 +77,28 @@ class ChanePassword extends Component {
                   if (res.ok) {
                       var {navigate} = this.props.navigation;
                       navigate('Main');
+                      this.setState({loading: false});
                       ToastAndroid.show('Change Success!', ToastAndroid.CENTER);
                   } else {
                     ToastAndroid.show('Change False!', ToastAndroid.CENTER);
+                    this.setState({loading: false});
                   }
               })
               .catch((err) => {
-                  console.log(err)
+                  console.log(err);
+                  this.setState({loading: false});
               })
           }
       })
     }
   render() {
+    if (this.state.loading) {
+        return(
+           <View style = {{flex: 1,justifyContent:'center',}}>
+             <ActivityIndicator size="large" color="#0000ff" />
+           </View>
+         )
+      } else {
     return (
         <View style={ styles.background}>
             <StatusBar hidden={false}></StatusBar>
@@ -119,7 +132,7 @@ class ChanePassword extends Component {
             </View>  
             </ScrollView>      
         </View>
-    );
+    );}
   }
 }
 

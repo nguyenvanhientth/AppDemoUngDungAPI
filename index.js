@@ -1,7 +1,7 @@
 /** @format */
 import React from 'react'
-import {AppRegistry, Text,Image, StyleSheet } from 'react-native'
-import { DrawerNavigator,StackNavigator,createDrawerNavigator,createStackNavigator} from 'react-navigation';
+import {AppRegistry } from 'react-native'
+import {createDrawerNavigator,createStackNavigator} from 'react-navigation';
 import {name as appName} from './app.json';
 
 import Splash from './component/screen/Splash';

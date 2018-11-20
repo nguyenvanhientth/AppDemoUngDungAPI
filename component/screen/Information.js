@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,View,Image,ScrollView,ToastAndroid,
+import {StyleSheet,Text,View,Image,ScrollView,ToastAndroid,ActivityIndicator,TextInput,
     AsyncStorage,TouchableOpacity,StatusBar,NativeModules} from 'react-native';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import env from '../environment/env';
@@ -9,15 +9,17 @@ import HeaderNavigation from './header/HeaderNavigation';
 
 
 var STORAGE_KEY = 'key_access_token';
-const update = require('../image/update.png') ;
 const date = require('../image/date.png') ;
 const image = require('../image/image.png') ;
 const phone = require('../image/phone.png') ;
 const address = require('../image/address.png') ;
 const email = require('../image/email.png') ;
-const role = require('../image/role.png') ;
+const update = require('../image/update.png') ;
+const dob = require('../image/dob.png') ;
+const name = require('../image/ic_user.png') ;
 const information = require('../image/information.png') ;
 var avatar = require('../image/avatar.png');
+var done = require('../image/done.png');
 const BASE_URL = env;
 var ImagePicker = NativeModules.ImageCropPicker;
 
@@ -41,19 +43,13 @@ export default class Information extends Component {
       Gender: '',
       Position: '',
       PhoneNumber: '',
-      passOld: '',
-      passNew: '',
-      passConfig: '',
-      dialogUpdate: false,
-      firstName1: null,
-      lastName1: null,
-      DOB1: null,
-      Address1: null,
-      PhoneNumber1: null,
       isDateTimePickerVisible: false,
       avatar: null,
       source: avatar,
-      updateAvata: false
+      updateAvata: false,
+      loading: true,
+      input: false,
+      input1: false,
     };
   }
   
@@ -81,54 +77,22 @@ export default class Information extends Component {
                     PhoneNumber: resJson.phoneNumber,
                     DOB: resJson.dateOfBirth,
                     Gender: resJson.gender,
-                    avatar: resJson.avatar
+                    avatar: resJson.avatar,
+                    loading: false
                 }); 
-                if (this.state.avatar === undefined) {
-                    
-                } else {
-                    
-                }
             })
             .catch ((error) => {
                 console.warn('AsyncStorage error:' + error.message);
+                this.setState({loading: false});
             })
         });
 
 
     } catch (error) {
+        this.setState({loading: false});
         console.log('AsyncStorage error: ' + error.message);
-        }            
+    }            
   }
-    dialogUpdate = ()=>{
-        this.setState({
-            dialogUpdate: true,
-        })
-    }
-    _onChaneFist = (e)=>{
-        this.setState({
-            firstName1:e
-        })
-    }
-    _onChaneLast=(e)=>{
-        this.setState({
-            lastName1:e
-        })
-    }
-    _onChaneAddress=(e)=>{
-        this.setState({
-            Address1:e
-        })
-    }
-    _onChanePhoneNumber=(e)=>{
-        this.setState({
-            PhoneNumber1:e
-        })
-    }
-    handleCancel = ()=>{
-        this.setState({
-            dialogUpdate: false,
-        })
-    }
     handleCancelAvatar =()=>{
         this.setState({
             updateAvata: false,
@@ -136,14 +100,15 @@ export default class Information extends Component {
         })
     }
     handleUpdate = ()=>{
+        this.setState({loading: true});
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;  
             let serviceUrl = BASE_URL+  "Account/ChangeInformationUser";
-            let firstName = this.state.firstName1;
-            let lastName = this.state.lastName1;
-            let dateOfBirth = this.state.DOB1;
-            let address = this.state.Address1;
-            let PhoneNumber = this.state.PhoneNumber1;
+            let firstName = this.state.firstName;
+            let lastName = this.state.lastName;
+            let dateOfBirth = this.state.DOB;
+            let address = this.state.Address;
+            let PhoneNumber = this.state.PhoneNumber;
             // kiem tra o day 
               fetch(serviceUrl,{
                   method: "PUT",          
@@ -175,16 +140,14 @@ export default class Information extends Component {
                       console.warn('Error Update',error);
                   });  
           })
-        this.setState({
-            dialogUpdate:false,
-        })
+          .then(this.setState({loading: false, input: false, input1: false}))
     }
-    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true, input1: true });
 
     _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
      _handleDatePicked = date => {
-        this.setState({ DOB1: date.toString() });
+        this.setState({ DOB: date.toString() });
         this._hideDateTimePicker();
     };
     _show =() =>{
@@ -198,14 +161,13 @@ export default class Information extends Component {
           forceJpg: true,
         }).then(images => {
             this.setState({
-              source: {uri: images.path, width: images.width, height: images.height, mime: images.mime}
+              source: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
+              updateAvata: true
             });
         }).catch(e => alert(e));
-        this.setState({
-            updateAvata: true
-        })
       }
       handleOk = ()=>{
+        this.setState({loading: true});
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;
             let url = BASE_URL + 'Account/UpdateAvatar';
@@ -226,6 +188,7 @@ export default class Information extends Component {
             })
             .then((response) =>{
                 if(response.ok){
+                    this.componentWillMount();
                     ToastAndroid.show('Update Avatar Success!', ToastAndroid.CENTER);
                 }
                 else{
@@ -235,18 +198,54 @@ export default class Information extends Component {
             .catch((error) =>{
                 console.warn('Update Avatar Error!', error);
             })
-        })
-        this.setState({updateAvata: false})
+        }).then(this.setState({loading: false,updateAvata: false}))
+      }
+      show_input = (text,image,a) =>{
+        return (
+            this.state.input ? 
+            <View style={styles.text}> 
+                <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                <TextInput style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
+            </View>:
+            <View style={styles.text}> 
+                <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                <Text style = {styles.text1}> {text} </Text> 
+            </View>
+            )
+      }
+      _changeText = (text,a) => {
+        switch (a) {
+            case 1:
+                this.setState({lastName: text})
+                break;
+            case 2:
+                this.setState({Address: text})
+                break;
+            case 3:
+                this.setState({PhoneNumber: text})
+                break;
+            default:
+            this.setState({firstName: text})
+                break;
+        }
       }
  render() {
-    const { isDateTimePickerVisible, DOB1 } = this.state;
+    const { isDateTimePickerVisible } = this.state;
+    if (this.state.loading) {
+        return(
+           <View style = {{flex: 1,justifyContent:'center',}}>
+             <ActivityIndicator size="large" color="#0000ff" />
+           </View>
+         )
+      } else {
         return (
+            <ScrollView>
             <View style={styles.container}>
                 <StatusBar hidden={false}></StatusBar>
                 <HeaderNavigation {...this.props}></HeaderNavigation>
                 <View style = {styles.contentName}>
                     <Text style = {{color: "#fff", fontSize: 30}}> Hi {this.state.firstName} {this.state.lastName}</Text>
-                    <Text style = {{color: "#fff", fontSize: 20}}>Active | {this.state.Gender} | Born {this.state.DOB}</Text>
+                    <Text style = {{color: "#fff", fontSize: 20}}>Active | {this.state.Gender} | {this.state.Position}</Text>
                         <TouchableOpacity onPress = {() =>this.pickMultiple()}>
                         {
                             this.state.avatar ? 
@@ -267,38 +266,13 @@ export default class Information extends Component {
                     </View>
                 </View>
                 <View style={styles.ThongTin}>
-                    <View style={styles.text}>
-                        <Image style = {styles.icon} resizeMode="contain" source = {address}/> 
-                        <Text style = {styles.text1}>{this.state.Address}</Text> 
-                    </View>
-                    <View style={styles.text}> 
-                        <Image style = {styles.icon} resizeMode="contain" source = {email} /> 
-                        <Text style = {styles.text1}>{this.state.Email}</Text> 
-                    </View>
-                    <View style={styles.text}> 
-                        <Image style = {styles.icon} resizeMode="contain" source = {phone} /> 
-                        <Text style = {styles.text1}>{this.state.PhoneNumber}</Text> 
-                    </View>
-                    <View style={styles.text}> 
-                        <Image style = {styles.icon} resizeMode="contain" source = {role} />
-                        <Text style = {styles.text1}> {this.state.Position}</Text>
-                    </View>
-                </View>
-                <View style={styles.footer}>
-                    <TouchableOpacity activeOpacity={.5} onPress={this.dialogUpdate.bind(this)} keyboardShouldPersistTaps={true}>
-                        <View style={[styles.button,]}>
-                            <Image style = {[styles.iconAdd,{backgroundColor: '#29ACE4'}]} source = {update} />
-                        </View>   
-                    </TouchableOpacity>
-                </View>
-                <Dialog.Container visible = {this.state.dialogUpdate}>
-                <ScrollView style = {styles.container1}>
-                    <Dialog.Title>Update Personal Information</Dialog.Title>
-                    <Dialog.Input placeholder = 'First Name!' onChangeText = {this._onChaneFist.bind(this)} ></Dialog.Input>
-                    <Dialog.Input placeholder = 'Last Name!' onChangeText = {this._onChaneLast.bind(this)} ></Dialog.Input>
-                    <View style = {styles.DOB}>
-                        <Text style={styles.textDate}>DateOfBirth: {DOB1}</Text>
-                        <TouchableOpacity onPress={this._showDateTimePicker}>
+                    {this.show_input(this.state.firstName,name)}
+                    {this.show_input(this.state.lastName,name,1)}
+                    {this.show_input(this.state.Address,address,2)}
+                    <View style = {styles.text}>
+                        <Image style = {styles.icon} resizeMode="contain" source = {dob} />
+                        <Text style = {styles.text1}>{this.state.DOB}</Text> 
+                        <TouchableOpacity style={{position: 'absolute', right: 10, top: 15}} onPress={this._showDateTimePicker}>
                             <Image style = {styles.iconDate} source={date}></Image>
                         </TouchableOpacity>
                         <DateTimePicker
@@ -309,22 +283,32 @@ export default class Information extends Component {
                             is24Hour = {false}
                         />
                     </View>
-                    <Dialog.Input placeholder = 'Address' onChangeText = {this._onChaneAddress.bind(this)} ></Dialog.Input>
-                    <Dialog.Input placeholder = 'Phone Number' onChangeText = {this._onChanePhoneNumber.bind(this)} ></Dialog.Input>
-                    <View style = {styles.DOB}>
-                        <Dialog.Button label="Cancel" onPress={this.handleCancel}/>
-                        <Dialog.Button label="Ok" onPress={this.handleUpdate} />
-                    </View>
-                </ScrollView>
-                </Dialog.Container>
+                    {this.show_input(this.state.PhoneNumber,phone,3)}
+                </View>
+                <View style={styles.footer}>
+                        {
+                            this.state.input | this.state.input1 ? 
+                            <TouchableOpacity activeOpacity={.5} onPress = {()=>this.handleUpdate()} keyboardShouldPersistTaps={true}>
+                                <View style={[styles.button,]}>
+                                    <Image style = {[styles.iconAdd,{backgroundColor: '#29ACE4'}]} source = {done} />
+                                </View>   
+                            </TouchableOpacity>:
+                            <TouchableOpacity activeOpacity={.5} onPress = {()=>this.setState({input: true})} keyboardShouldPersistTaps={true}>
+                                <View style={[styles.button,]}>
+                                    <Image style = {[styles.iconAdd,{backgroundColor: '#29ACE4'}]} source = {update} />
+                                </View>   
+                            </TouchableOpacity>
+                        }     
+                </View>
                 <Dialog.Container visible = {this.state.updateAvata}>
                     <Dialog.Title> You are want change Avatar! </Dialog.Title>
                     <Dialog.Button label="Cancel" onPress={this.handleCancelAvatar} />
                     <Dialog.Button label="Ok" onPress={this.handleOk} />
                 </Dialog.Container>
             </View>
-        );
-  } 
+            </ScrollView>
+        );}
+    } 
 }
  
 const styles = StyleSheet.create({
@@ -367,7 +351,8 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 20,
     textAlign: 'center',
-    marginLeft: 15
+    marginLeft: 15,
+    width: '80%',
   },
   textDate: {
     color: '#424040',
@@ -392,15 +377,18 @@ const styles = StyleSheet.create({
     },
     DOB: {
         flexDirection: 'row',
-        flex: 0.1,
-        alignContent: 'center',
-        justifyContent:'center',
-        paddingLeft:10
+        flex: 0.2,
+        width: '100%',
+        alignItems:"flex-start",
+        paddingTop: 10,
+        paddingBottom: 20,
+        backgroundColor: '#fff',
+        borderBottomWidth: 2,
+        borderBottomColor: 'gray',
     },
     iconDate: {
         width:40,
         height: 40,
-        marginLeft: 10,
     },
     icon: {
         width: 25,
@@ -410,5 +398,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: '#29ACE4',
         padding: 20
+    },
+    icon1: {
+        width: 30,
+        height: 30,
+        position: 'absolute',
+        right: 0,
+        top: 20,
     }
 });

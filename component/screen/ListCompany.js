@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,Image } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
+    ActivityIndicator,Image } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
 const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
 const edit = require('../image/edit.png') ;
+const addCompany = require('../image/addCompany.png') ;
  
 export default class ListChecked extends Component {
     static navigationOptions = {
@@ -25,7 +27,9 @@ export default class ListChecked extends Component {
             dialogStatus: false,
             id:'',
             companyName:'',
-            addressCompany: ''
+            addressCompany: '',
+            loading: true
+            
     }
   };
   componentDidMount(){
@@ -45,12 +49,14 @@ export default class ListChecked extends Component {
           .then((res) => res.json())
           .then((resData) => { 
               this.setState({
-                  data : resData
+                  data : resData,
+                  loading: false
                 });
                 //console.warn('data',this.state.data);
             })
           .catch((err) => {
             console.warn(' loi update Area1',err);
+            this.setState({loading: false});
           })
         })
     }
@@ -80,6 +86,7 @@ export default class ListChecked extends Component {
   }
   handleChange = () =>{
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+        this.setState({loading: true});
         let token = user_data_json;  
         let serviceUrl = BASE_URL+  "Company/ChangeCompanyStatus";
         let id = this.state.id;
@@ -100,13 +107,16 @@ export default class ListChecked extends Component {
                       if(responseJSON.ok){
                           this.componentDidMount();
                           alert('Change Success!');
+                          this.setState({loading: false});
                       }
                       else {
                           alert('Change False!');
+                          this.setState({loading: false});
                       }
                       
               })
               .catch((error) => {
+                this.setState({loading: false});
                   console.warn('Error: ',error);
               });  
       })
@@ -114,10 +124,14 @@ export default class ListChecked extends Component {
           dialogStatus:false,
       })
   }
-
+    componentDidUpdate(prevProps){
+        this.componentDidMount();
+    }
   _renderList = ({ item }) => {
     return (
-     <TouchableOpacity style={styles.flatview} onPress={() =>this.changeStatus(item.id)}>
+     <TouchableOpacity disabled = {this.state.loading} style={styles.flatview} 
+        onLongPress = {() =>this.props.navigation.navigate('EditCompanyPage',{id:item.id,address: item.address, image: item.logo, name: item.name})}
+        onPress={() =>this.props.navigation.navigate('ListUserPage',{id:item.id})}>
         <Image style = {styles.anh} source= {{uri: item.logo}} resizeMode="contain"/>
         <View style = {styles.nameList}>
             <Text style={styles.name} >{item.name}</Text>
@@ -125,7 +139,7 @@ export default class ListChecked extends Component {
             <Text style={styles.status} >Status: {String(item.status)}</Text>
         </View>
         <View style = {styles.iconWrap}>
-        <TouchableOpacity onPress = {()=>this.props.navigation.navigate('EditCompanyPage',{id:item.id})}><Image source = {edit} style={styles.icon} /></TouchableOpacity>
+        <TouchableOpacity onPress = {()=>this.props.navigation.navigate('EditCompanyPage',{id:item.id,address: item.address, image: item.logo, name: item.name})}><Image source = {edit} style={styles.icon} /></TouchableOpacity>
         </View>
      </TouchableOpacity>
     );
@@ -133,22 +147,37 @@ export default class ListChecked extends Component {
   }
 
   render() {
-    return (
-      <View style={styles.container} > 
-          <FlatList
-          data={this.state.data}
-          ItemSeparatorComponent = {this.FlatListItemSeparator}
-          renderItem={this._renderList}
-          keyExtractor={item => item.id}
-        />
-        <Dialog.Container visible = {this.state.dialogStatus}>
-            <Dialog.Title> You are want change status! </Dialog.Title>
-            <Dialog.Button label="Ok" onPress={this.handleChange} />
-            <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-        </Dialog.Container>
-      </View>
-    );
-  }
+    if (this.state.loading) {
+        return(
+           <View style = {{flex: 1,justifyContent:'center',}}>
+             <ActivityIndicator size="large" color="#0000ff" />
+           </View>
+         )
+      } else {
+            return (
+            <View style={styles.container} > 
+                <FlatList
+                data={this.state.data}
+                ItemSeparatorComponent = {this.FlatListItemSeparator}
+                renderItem={this._renderList}
+                keyExtractor={item => item.id}
+                />
+                <View style={styles.footer}>
+                    <TouchableOpacity activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('CreateCompanyPage')} keyboardShouldPersistTaps={true}>
+                        <View style={[styles.button,{borderRadius: 50}]}>
+                            <Image style = {[styles.iconAdd,]} resizeMode="contain" source = {addCompany} />
+                        </View>   
+                    </TouchableOpacity>
+                </View>
+                <Dialog.Container visible = {this.state.dialogStatus}>
+                    <Dialog.Title> You are want change status! </Dialog.Title>
+                    <Dialog.Button label="Ok" onPress={this.handleChange} />
+                    <Dialog.Button label="Cancel" onPress={this.handleCancel} />
+                </Dialog.Container>
+            </View>
+            );
+        }
+    }
 }
 const styles = StyleSheet.create({
     container: {
@@ -178,9 +207,10 @@ const styles = StyleSheet.create({
         right: 0
       },
     footer: {
+        position: 'absolute',
         flex:1,
-        backgroundColor:'#1C1C1C',
-        height: 1,
+        right: 0,
+        bottom: 10,
     },
     icon:{
         marginTop: 10,
@@ -207,4 +237,19 @@ const styles = StyleSheet.create({
         height: 90,
         borderRadius: 100
       },
+    button:{
+        paddingVertical: 8,
+        marginVertical:3,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 50,
+        marginLeft: 20,
+        marginRight: 20
+    },
+    iconAdd:{
+        marginTop: 10,
+        width:50,
+        height:50,
+        borderRadius:50,
+        },
 })

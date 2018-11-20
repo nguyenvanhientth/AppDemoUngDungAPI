@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,TextInput,View,TouchableOpacity,ToastAndroid,
+import {StyleSheet,Text,TextInput,View,TouchableOpacity,ToastAndroid,ActivityIndicator,
   Image,AsyncStorage, ScrollView,Dimensions,NativeModules} from 'react-native';
 import env from '../environment/env';
 
@@ -11,7 +11,7 @@ var ImagePicker = NativeModules.ImageCropPicker;
 
 export default class EditCompany extends Component {
     static navigationOptions = {
-        title: 'Create Company',
+        title: 'Edit Company',
         headerStyle: {
             backgroundColor: '#29ACE4',
           },
@@ -23,10 +23,12 @@ export default class EditCompany extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        images: [],
-        companyName: '',
-        address: '',
+        image: null,
+        e: this.props.navigation.getParam('image'),
+        companyName: this.props.navigation.getParam('name'),
+        address: this.props.navigation.getParam('address'),
         id: this.props.navigation.getParam('id'),
+        loading: false,
     };
   }
 
@@ -41,21 +43,22 @@ export default class EditCompany extends Component {
     }
     _onEdit = () =>{
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+            this.setState({loading: true})
             let token = user_data_json;  
             let serviceUrl = BASE_URL+  "Company/ChangeInformationCompany";
             const sessionId = new Date().getTime();
             let data = new FormData();
-            let image = this.state.images ? this.state.images[0]:null;
             data.append("CompanyId",this.state.id)
             data.append("Name",this.state.companyName);
             data.append("Address",this.state.address);
-            if (image !== undefined) {
+            if (this.state.image !== undefined) {
                 data.append("Logo",{
-                    uri: image.uri,
+                    uri: this.state.image.uri,
                     type: 'image/jpg',
                     name: `${sessionId}.jpg`,
                   });
             }
+            console.warn('data',data)
             // kiem tra o day 
             fetch(serviceUrl,{
                 method: 'PUT',
@@ -70,84 +73,84 @@ export default class EditCompany extends Component {
                     console.warn('edit company',responseJSON)
                           if(responseJSON.ok){
                               var { navigate } = this.props.navigation;
-                              navigate('drawerStack');
+                              navigate('ListCompanyPage');
+                              this.setState({loading: false});
                               ToastAndroid.show('Edit Success!', ToastAndroid.CENTER);
                           }
                           else {
                             ToastAndroid.show('Edit False!', ToastAndroid.CENTER);
+                            this.setState({loading: false});
                           }
                           
                   })
                   .catch((error) => {
                       console.warn('Error: ',error);
+                      this.setState({loading: false});
                   });  
           })
     }
     pickMultiple() {
         ImagePicker.openPicker({
-          multiple: true,
+          multiple: false,
           waitAnimationEnd: false,
           includeExif: true,
           forceJpg: true,
         }).then(images => {
-          this.setState({
-            images: images.map(i => {
-              //console.warn('received image', i);
-              return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
-            })
-          });
+            this.setState({
+                image: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
+                });
         }).catch(e => alert(e));
       }
-    renderImage(image) {
-        return <Image style={{width: 300, height: 300, resizeMode: 'contain',marginLeft: 10}} source={image} />
-    }
-    
-    renderAsset(image) {
-        return this.renderImage(image);
-    }
     render() {
         var { navigate } = this.props.navigation;
-    return (
-        <ScrollView>
-        <View style={ styles.background}>
-            <View style={styles.container}/>
-                <View style={styles.wrapper}>
-                    <ScrollView horizontal = {true}>
-                        {this.state.images ? this.state.images.map(i => <View key={i.uri}>{this.renderAsset(i)}</View>) : null}
-                    </ScrollView>
-                    <View style={styles.inputWrap}>
-                        <View style={styles.iconWrap}>
-                            <Image source={company} resizeMode="contain" style={styles.icon}/>
+        if (this.state.loading) {
+            return(
+               <View style = {{flex: 1,justifyContent:'center',}}>
+                 <ActivityIndicator size="large" color="#0000ff" />
+               </View>
+             )
+          } else {
+            return (
+                <ScrollView>
+                <View style={ styles.background}>
+                    <View style={styles.wrapper}>
+                        <View style= {{alignItems: 'center', height: '40%', margin: 20}}>
+                            <TouchableOpacity style = {{alignItems:'center',width: '50%',height: '100%', margin: 10,borderRadius: 100, backgroundColor: '#fff'}} onPress = {() =>this.pickMultiple()}>
+                            {
+                                this.state.image ? <Image style = {{width: '100%', height: '100%',borderRadius: 150}} resizeMode="contain" source={this.state.image}  />
+                                : <Image style = {{width: '100%', height: '100%',borderRadius: 150}} resizeMode="contain" source={{uri: this.state.e}}  />
+                            }
+                            </TouchableOpacity>
                         </View>
-                        <TextInput  style={styles.input} placeholder="CompanyName" onChangeText={this._onChaneCompanyName.bind(this)} underlineColorAndroid="transparent"/>
-                    </View>
-                    <View style={styles.inputWrap}>
-                        <View style={styles.iconWrap}>
-                            <Image source={address} resizeMode="contain" style={styles.icon}/>
+                        <View style={styles.inputWrap}>
+                            <View style={styles.iconWrap}>
+                                <Image source={company} resizeMode="contain" style={styles.icon}/>
+                            </View>
+                            <TextInput  style={styles.input} placeholder="CompanyName" onChangeText={this._onChaneCompanyName.bind(this)} underlineColorAndroid="transparent" value = {this.state.companyName}/>
                         </View>
-                        <TextInput  style={styles.input} placeholder="Address" onChangeText={this._onchaneAddress.bind(this)} underlineColorAndroid="transparent"/>
-                    </View>
-                    <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
-                        <View style = {[styles.button,{backgroundColor:'#58ACFA'}]}>
-                            <Text style = {styles.buttonText}>Select New Logo Company</Text>
+                        <View style={styles.inputWrap}>
+                            <View style={styles.iconWrap}>
+                                <Image source={address} resizeMode="contain" style={styles.icon}/>
+                            </View>
+                            <TextInput  style={styles.input} placeholder="Address" onChangeText={this._onchaneAddress.bind(this)} underlineColorAndroid="transparent" value = {this.state.address}/>
                         </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={.5} onPress={this._onEdit.bind(this)} keyboardShouldPersistTaps={true}>
-                        <View style={styles.button}>
-                            <Text style={styles.buttonText}> Editing </Text>
-                        </View>           
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={.5} onPress={() => navigate('drawerStack')}>
-                        <View >
-                            <Text style={styles.forgotPasswordText}>Cancel</Text>        
-                        </View>      
-                    </TouchableOpacity>
-                </View>                        
-            <View style={styles.container}/>
-        </View>
-        </ScrollView>
-    );
-  }
+                        <TouchableOpacity disabled = {this.state.loading} activeOpacity={.5} onPress={this._onEdit.bind(this)} keyboardShouldPersistTaps={true}>
+                            <View style={styles.button}>
+                                <Text style={styles.buttonText}> Editing </Text>
+                            </View>           
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={.5} onPress={() => navigate('drawerStack')}>
+                            <View >
+                                <Text style={styles.forgotPasswordText}>Cancel</Text>        
+                            </View>      
+                        </TouchableOpacity>
+                    </View>                        
+                    <View style={styles.container}/>
+                </View>
+                </ScrollView>
+            );
+        }
+    }
 }
 
 const styles = StyleSheet.create({
@@ -190,6 +193,7 @@ const styles = StyleSheet.create({
         marginVertical:8,
         alignItems: "center",
         justifyContent: "center",
+        borderRadius: 10
     },
     buttonText: {
       fontSize: 16,

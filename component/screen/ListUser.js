@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
-    Image, ToastAndroid } from "react-native";
+    Image, ToastAndroid,ActivityIndicator } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
@@ -26,7 +26,8 @@ export default class ListUser extends Component {
         this.state = {
             data: [],
             id: '',
-            dialogStatus: false
+            dialogStatus: false,
+            loading: true
     }
   };
   componentDidMount(){
@@ -35,6 +36,7 @@ export default class ListUser extends Component {
         if(token === undefined){
           var { navigate } = this.props.navigation;
           navigate('LoginPage');
+          this.setState({loading: false})
         }    
         let url = BASE_URL + 'Account/GetStaffByAdmin';
         fetch(url,{
@@ -46,12 +48,14 @@ export default class ListUser extends Component {
           .then((res) => res.json())
           .then((resData) => { 
               this.setState({
-                  data : resData
+                  data : resData,
+                  loading: false
                 });
                 //console.warn('data',this.state.data);
             })
           .catch((err) => {
             console.warn(' Error Update!',err);
+            this.setState({loading: false})
           })
         })
     }
@@ -122,44 +126,54 @@ export default class ListUser extends Component {
                       //console.warn('creacte company',responseJSON)
                           if(responseJSON.ok){
                               this.componentDidMount();
-                              ToastAndroid.show('Change Success!', ToastAndroid.SHORT)
+                              ToastAndroid.show('Change Success!', ToastAndroid.SHORT);
                           }
                           else {
-                              ToastAndroid.show('Change False!', ToastAndroid.SHORT)
+                              
+                              ToastAndroid.show('Change False!', ToastAndroid.SHORT);
                           }
                           
                   })
                   .catch((error) => {
+                    
                       console.warn('Error: ',error);
-                  });  
-          })
-          this.setState({
+                  });
+                })
+            this.setState({
               dialogStatus:false,
-          })
-      }
-      handleCancel = ()=>{
-        this.setState({
-            dialogStatus: false,
+              loading: false
         })
-      }
+    }
+handleCancel = ()=>{
+    this.setState({
+        dialogStatus: false,
+    })
+}
 
   render() {
-    return (
-      <View style={styles.container} > 
-          <FlatList
-          data={this.state.data}
-          ItemSeparatorComponent = {this.FlatListItemSeparator}
-          renderItem={this._renderList}
-          keyExtractor={item => item.id}
-        />
-        <Dialog.Container visible = {this.state.dialogStatus}>
-            <Dialog.Title> You are want change activate or deactivate! </Dialog.Title>
-            <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-            <Dialog.Button label="Ok" onPress={this.handleChange} />
-        </Dialog.Container>
-      </View>
-    );
-  }
+    if (this.state.loading) {
+        return(
+            <View style = {styles.background}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          )
+    } else {
+        return (
+        <View style={styles.container} > 
+            <FlatList
+            data={this.state.data}
+            ItemSeparatorComponent = {this.FlatListItemSeparator}
+            renderItem={this._renderList}
+            keyExtractor={item => item.id}
+            />
+            <Dialog.Container visible = {this.state.dialogStatus}>
+                <Dialog.Title> You are want change activate or deactivate! </Dialog.Title>
+                <Dialog.Button label="Cancel" onPress={this.handleCancel} />
+                <Dialog.Button label="Ok" onPress={this.handleChange} />
+            </Dialog.Container>
+        </View>
+        );}
+    }
 }
 const styles = StyleSheet.create({
     container: {

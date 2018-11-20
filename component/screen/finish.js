@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView, TextInput,
+import {View, Text, StyleSheet, ScrollView, ActivityIndicator,
   Image, TouchableOpacity, NativeModules, Dimensions, AsyncStorage
 } from 'react-native';
 import env from '../environment/env';
@@ -7,7 +7,8 @@ import env from '../environment/env';
 var ImagePicker = NativeModules.ImageCropPicker;
 const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
-
+const camera = require('../image/camera.png');
+const photo = require('../image/photoLibrary.png');
 
 export default class Finish extends Component {
   static navigationOptions = {
@@ -28,6 +29,7 @@ export default class Finish extends Component {
       images: [],
       data:[],
       id: this.props.navigation.getParam('id'),
+      loading: false
     };
   }
 
@@ -66,7 +68,7 @@ export default class Finish extends Component {
     }).catch(e => alert(e));
   }
   renderImage(image) {
-    return <Image style={{width: 300, height: 300, resizeMode: 'contain',marginLeft: 10}} source={image} />
+    return <Image style={{width: 300, height: 300, resizeMode: 'contain',marginLeft: 10, borderRadius: 10}} source={image} />
   }
 
   renderAsset(image) {
@@ -75,10 +77,12 @@ export default class Finish extends Component {
 
   Upload = () => {
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+      this.setState({loading: true});
       let token = user_data_json;   
       if(token === undefined){
         var { navigate } = this.props.navigation;
         navigate('LoginPage');
+        this.setState({loading: false});
        }    
       let url = BASE_URL + 'Request/RepairPersonFinish';
       let data = new FormData();
@@ -109,18 +113,28 @@ export default class Finish extends Component {
         if(res.ok){
           var { navigate } = this.props.navigation;
           navigate('drawerStack');
+          this.setState({loading: false});
           alert('Request Success!');
         }
           else {
             alert('Request False!');
+            this.setState({loading: false});
         }
       })
       .catch((err) => {
         console.warn(' loi update image',err);
+        this.setState({loading: false});
       })
     })
   }
   render() {
+    if (this.state.loading) {
+      return(
+         <View style = {{flex: 1,justifyContent:'center',}}>
+           <ActivityIndicator size="large" color="#0000ff" />
+         </View>
+       )
+    } else {
       return (
         <ScrollView>
           <View style= {styles.container}>
@@ -131,14 +145,16 @@ export default class Finish extends Component {
             </ScrollView>
             </View>
             <View>
-              <View>
+              <View style = {{flexDirection: 'row', alignItems: 'center',alignContent: 'center', justifyContent: 'center'}}>
                 <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} keyboardShouldPersistTaps={true}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonText}> Select image camera</Text>
+                  <View style={{borderRadius: 30,margin: 30}}>
+                    <Image style = {styles.camera} resizeMode="contain" source = {camera} />
                   </View>  
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.pickMultiple.bind(this)} style={styles.button}>
-                  <Text style={styles.buttonText}>Select Multiple</Text>
+                <TouchableOpacity onPress={this.pickMultiple.bind(this)}>
+                  <View style={{borderRadius: 30,margin: 30}}>
+                    <Image style = {styles.camera} resizeMode="contain" source = {photo}/>
+                  </View>
                 </TouchableOpacity>
               </View>
             <TouchableOpacity onPress={this.Upload.bind(this)} style={styles.button}>
@@ -148,6 +164,7 @@ export default class Finish extends Component {
           </View>
       </ScrollView>
       );
+    }
   }
 }
 
@@ -182,5 +199,9 @@ buttonText: {
   fontSize: 16,
   color:'#FFFFFF',
   textAlign: 'center',   
+},
+camera: {
+  width: 50, 
+  height: 50,  
 },
 });

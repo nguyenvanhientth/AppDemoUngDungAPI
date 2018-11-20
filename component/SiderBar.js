@@ -34,7 +34,8 @@ export default class SiderBar extends Component {
                         firstName: resJson.firstName,
                         lastName: resJson.lastName,
                         avatar: resJson.avatar,
-                    });     
+                    });    
+                    debugger; 
                 })
                 .catch ((error) => {
                     console.warn('AsyncStorage error:' + error.message);

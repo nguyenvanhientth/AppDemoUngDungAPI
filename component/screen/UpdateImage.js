@@ -28,7 +28,6 @@ const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
 const company = require('../image/company.png') ;
 const map = require('../image/map.jpg') ;
-const submit = require('../image/submit.gif');
 const camera = require('../image/camera.png');
 const photo = require('../image/photoLibrary.png');
 
@@ -57,7 +56,7 @@ export default class App extends Component {
       longitude: this.props.navigation.getParam('long'),
       data:[],
       mapRegion: null,
-      loading: false
+      loading: true,
     };
   }
 
@@ -105,6 +104,7 @@ export default class App extends Component {
           console.warn(' loi update Area1',err);
         })
       })
+    this.setState({loading: false});
   }
 
   pickSingleWithCamera(cropping) {
@@ -157,13 +157,19 @@ export default class App extends Component {
       let url = BASE_URL + 'Request/InsertRequest';
       let data = new FormData();
       const sessionId = new Date().getTime();
-      data.append("Content",this.state.content);
+      let arrImage = [];
+      this.state.image ? arrImage.push(this.state.image) : arrImage = [...this.state.images];
+      if (this.state.content.length ===0 ||this.state.address.length ===0 ||
+        this.state.company.length === 0|| arrImage.length === 0) {
+        alert('You have not entered enough!');
+        this.setState({loading: false});
+      }
+      else {
+        data.append("Content",this.state.content);
       data.append("Address",this.state.address);
       data.append("CompanyId",this.state.company)
       data.append("LatIng_longitude",this.state.longitude);
       data.append("Latlng_latitude",this.state.latitude);
-      let arrImage = [];
-      this.state.image ? arrImage.push(this.state.image) : arrImage = [...this.state.images];
       //console.warn('image',arrImage);
       arrImage.map((i) =>{
         data.append("PictureRequest",{
@@ -185,26 +191,26 @@ export default class App extends Component {
       .then((res) => {
         //console.warn(res); 
         if(res.ok){
-          this.setState({loading: false});
           var { navigate } = this.props.navigation;
           navigate('drawerStack');
           ToastAndroid.show('Request Success!', ToastAndroid.CENTER);
         }
           else {
-            this.setState({loading: false});
             ToastAndroid.show('Update False!', ToastAndroid.CENTER);
         }
       })
       .catch((err) => {
-        this.setState({loading: false});
-        console.warn(' loi update image',err);
-      })
+        console.warn(' Error Update image',err);
+      });
+      this.setState({loading: false});
+      }
     })
   }
   _updateCompany = (id) => {
-    this.setState({company: id})
-}
+    this.setState({company: id});
+  }
   render() {
+    //------------------------------------------------
     if (this.state.loading) {
       return(
           <View style = {styles.background}>
@@ -262,8 +268,8 @@ export default class App extends Component {
               </TouchableOpacity>
             </View>
             <View style = {{alignItems:'center', opacity: 1}}>
-              <TouchableOpacity onPress={this.Upload.bind(this)} style = {{ width: '45%',alignItems: "center", bottom: 10}}>
-                <Image source = {submit} resizeMode="contain" style = {{height: 50}} />
+              <TouchableOpacity onPress={this.Upload.bind(this)} style = {{ width: '45%',alignItems: "center", bottom: 10,borderRadius: 10, backgroundColor: '#2ECCFA'}}>
+                <Text style = {{fontSize: 20, padding: 10 }}>Submit</Text>
               </TouchableOpacity>
             </View>
         </View>
