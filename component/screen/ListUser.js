@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
-    Image, ToastAndroid,ActivityIndicator } from "react-native";
+    Image, ToastAndroid,ActivityIndicator,Switch } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
 const BASE_URL = env;
 var avatar = require('../image/avatar.png');
-var dung = require('../image/true.png');
-var sai = require('../image/false.png');
 var STORAGE_KEY = 'key_access_token';
  
 export default class ListUser extends Component {
@@ -32,13 +30,14 @@ export default class ListUser extends Component {
   };
   componentDidMount(){
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
-        let token = user_data_json;   
+        let token = user_data_json; 
+        let companyId = this.props.navigation.getParam('id');
         if(token === undefined){
           var { navigate } = this.props.navigation;
           navigate('LoginPage');
           this.setState({loading: false})
         }    
-        let url = BASE_URL + 'Account/GetStaffByAdmin';
+        let url = BASE_URL + 'Account/GetStaffByCompanyId?companyId=' + companyId;
         fetch(url,{
             headers: {
               'cache-control': 'no-cache',
@@ -75,7 +74,7 @@ export default class ListUser extends Component {
 
   _renderList = ({ item }) => {
     return (
-     <TouchableOpacity style={styles.flatview} onPress={() =>this.changeActivate(item.id)}>
+     <TouchableOpacity style={styles.flatview} onPress={() =>ToastAndroid.show('Click',ToastAndroid.SHORT)}>
         {
             item.avatar ? 
             <Image style = {styles.anh} source= {{uri: item.avatar}} resizeMode="contain"/>:
@@ -86,19 +85,23 @@ export default class ListUser extends Component {
             <Text style={styles.email} >Email: {(item.email)}</Text>
             <Text style={styles.email} >Role: {(item.role)}</Text>
         </View>
-        <View style = {styles.iconWrap}>{this.status(item.isEnabled)}</View>
+        <View style = {styles.iconWrap}>
+            {
+                item.isEnabled ?
+                <Switch
+                    style = {{trackColor: {false: 'red',true: 'green'}}}
+                    value = { true }
+                    onValueChange = {()=>this.changeActivate(item.id)}/> : 
+                <Switch
+                    style = {{trackColor: {false: 'red',true: 'green'}}}
+                    value = { false }
+                    onValueChange = {()=>this.changeActivate(item.id)}
+                />
+            }
+        </View>
      </TouchableOpacity>
     );
-
-  }
-  status = (status) =>{
-    if(status === true){
-      return <Image style = {styles.status} source = {dung}/>
     }
-    else {
-      return <Image style = {styles.status} source = {sai}/>
-    }
-}
     changeActivate = (id)=>{
         this.setState({
             dialogStatus: true,
@@ -158,21 +161,30 @@ handleCancel = ()=>{
             </View>
           )
     } else {
-        return (
-        <View style={styles.container} > 
-            <FlatList
-            data={this.state.data}
-            ItemSeparatorComponent = {this.FlatListItemSeparator}
-            renderItem={this._renderList}
-            keyExtractor={item => item.id}
-            />
-            <Dialog.Container visible = {this.state.dialogStatus}>
-                <Dialog.Title> You are want change activate or deactivate! </Dialog.Title>
-                <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-                <Dialog.Button label="Ok" onPress={this.handleChange} />
-            </Dialog.Container>
-        </View>
-        );}
+        if (this.state.data.length === 0) {
+           return(
+            <View style={[styles.container,{alignItems: "center"}]} > 
+                <Text style = {styles.name}>No Employees!!!</Text>
+            </View>
+            )
+        } else {
+            return (
+                <View style={styles.container} > 
+                    <FlatList
+                    data={this.state.data}
+                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    renderItem={this._renderList}
+                    keyExtractor={item => item.id}
+                    />
+                    <Dialog.Container visible = {this.state.dialogStatus}>
+                        <Dialog.Title> You are want change activate or deactivate! </Dialog.Title>
+                        <Dialog.Button label="Cancel" onPress={this.handleCancel} />
+                        <Dialog.Button label="Ok" onPress={this.handleChange} />
+                    </Dialog.Container>
+                </View>
+                ); 
+            }
+        }
     }
 }
 const styles = StyleSheet.create({
@@ -226,7 +238,7 @@ const styles = StyleSheet.create({
         marginLeft:10,
         position: 'absolute',
         right: 10,
-        top: 15
+        top: 20
         },
     status: {
         width: 50,

@@ -139,7 +139,7 @@ export default class EditCompany extends Component {
                                 <Text style={styles.buttonText}> Editing </Text>
                             </View>           
                         </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={.5} onPress={() => navigate('drawerStack')}>
+                        <TouchableOpacity activeOpacity={.5} onPress={() => navigate('ListCompanyPage')}>
                             <View >
                                 <Text style={styles.forgotPasswordText}>Cancel</Text>        
                             </View>      

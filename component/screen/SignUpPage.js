@@ -75,6 +75,11 @@ export default class SignUpPage extends Component {
       let Pos = this.state.Position;
       let PhoneNumber = this.state.PhoneNumber;
       // kiem tra o day 
+      if (userName.length === 0 || Email.length === 0||
+        gender.length === 0 ||Pos.length === 0 ||PhoneNumber.length === 0) {
+        alert('You have not entered enough!');
+        this.setState({loading: false})
+        } 
         fetch(serviceUrl,{
             method: "POST",          
         headers: {

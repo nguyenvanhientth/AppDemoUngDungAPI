@@ -14,7 +14,6 @@ export default class HeaderNavigation extends Component {
                 }}>
                 <Image style={{ width: 25, height: 25 }} source={menuIcon}/>
             </TouchableOpacity>
-
             <Text style={styles.titleText}>{key}</Text>
         </View>);
     }

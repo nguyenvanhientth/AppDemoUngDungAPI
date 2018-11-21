@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
-    ActivityIndicator,Image } from "react-native";
+    ActivityIndicator,Image, Switch, ToastAndroid } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
 const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
-const edit = require('../image/edit.png') ;
-const addCompany = require('../image/addCompany.png') ;
+const addCompany = require('../image/add.jpg') ;
  
 export default class ListChecked extends Component {
     static navigationOptions = {
@@ -28,8 +27,8 @@ export default class ListChecked extends Component {
             id:'',
             companyName:'',
             addressCompany: '',
-            loading: true
-            
+            loading: true,
+            toggel: false,
     }
   };
   componentDidMount(){
@@ -106,12 +105,12 @@ export default class ListChecked extends Component {
                   //console.warn('creacte company',responseJSON)
                       if(responseJSON.ok){
                           this.componentDidMount();
-                          alert('Change Success!');
+                          ToastAndroid.show('Change Success!',ToastAndroid.CENTER);
                           this.setState({loading: false});
                       }
                       else {
-                          alert('Change False!');
-                          this.setState({loading: false});
+                            ToastAndroid.show('Change False!',ToastAndroid.CENTER);
+                            this.setState({loading: false});
                       }
                       
               })
@@ -136,12 +135,23 @@ export default class ListChecked extends Component {
         <View style = {styles.nameList}>
             <Text style={styles.name} >{item.name}</Text>
             <Text style={styles.address} >Address: {item.address}</Text>
-            <Text style={styles.status} >Status: {String(item.status)}</Text>
+            {/* <Text style={styles.status} >Status: {String(item.status)}</Text> */}
         </View>
         <View style = {styles.iconWrap}>
-        <TouchableOpacity onPress = {()=>this.props.navigation.navigate('EditCompanyPage',{id:item.id,address: item.address, image: item.logo, name: item.name})}><Image source = {edit} style={styles.icon} /></TouchableOpacity>
+            {
+                item.status ?
+                <Switch
+                    style = {{trackColor: {false: 'red',true: 'green'}}}
+                    value = { true }
+                    onValueChange = {()=>this.changeStatus(item.id)}/> : 
+                <Switch
+                    style = {{trackColor: {false: 'red',true: 'green'}}}
+                    value = { false }
+                    onValueChange = {()=>this.changeStatus(item.id)}
+                />
+            }
         </View>
-     </TouchableOpacity>
+    </TouchableOpacity>
     );
 
   }
@@ -170,7 +180,7 @@ export default class ListChecked extends Component {
                     </TouchableOpacity>
                 </View>
                 <Dialog.Container visible = {this.state.dialogStatus}>
-                    <Dialog.Title> You are want change status! </Dialog.Title>
+                    <Dialog.Title> You are want change status? </Dialog.Title>
                     <Dialog.Button label="Ok" onPress={this.handleChange} />
                     <Dialog.Button label="Cancel" onPress={this.handleCancel} />
                 </Dialog.Container>
@@ -225,7 +235,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         flex:1,
         right: 10,
-        top: 12
+        top: 20
         },
     nameList: {
         left: 0,

@@ -11,6 +11,7 @@
     "react": "16.6.0-alpha.8af6728",
     "react-dialog": "^1.0.2",
     "react-native": "0.57.4",
+    "react-native-cli": "^2.0.1",
     "react-native-communications": "^2.2.1",
     "react-native-dialog": "^5.4.0",
     "react-native-image-crop-picker": "^0.21.3",

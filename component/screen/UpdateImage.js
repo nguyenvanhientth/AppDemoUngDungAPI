@@ -202,9 +202,8 @@ export default class App extends Component {
       .catch((err) => {
         console.warn(' Error Update image',err);
       });
-      this.setState({loading: false});
       }
-    })
+    }).then(this.setState({loading: false}))
   }
   _updateCompany = (id) => {
     this.setState({company: id});

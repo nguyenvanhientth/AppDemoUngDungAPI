@@ -504,6 +504,7 @@ buttonAd:{
     fuilter:{
         backgroundColor: '#FAFAFA',
         marginTop: 10,
+        marginBottom: 10,
         flexDirection: 'row',
         justifyContent: "center"
     },

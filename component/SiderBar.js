@@ -45,6 +45,9 @@ export default class SiderBar extends Component {
             console.log('AsyncStorage error: ' + error.message);
             }            
       }
+      componentDidUpdate(){
+            this.componentWillMount();
+        }
     render(){
         const props = this.props;
         return (
