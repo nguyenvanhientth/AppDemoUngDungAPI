@@ -164,7 +164,7 @@ export default class Information extends Component {
               source: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
               updateAvata: true
             });
-        }).catch(e => alert(e));
+        }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
       }
       handleOk = ()=>{
         this.setState({loading: true});
@@ -205,7 +205,7 @@ export default class Information extends Component {
             this.state.input ? 
             <View style={styles.text}> 
                 <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
-                <TextInput style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
+                <TextInput autoFocus = {true} style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
             </View>:
             <View style={styles.text}> 
                 <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
@@ -301,7 +301,7 @@ export default class Information extends Component {
                         }     
                 </View>
                 <Dialog.Container visible = {this.state.updateAvata}>
-                    <Dialog.Title> You are want change Avatar! </Dialog.Title>
+                    <Dialog.Title> Are you want change Avatar? </Dialog.Title>
                     <Dialog.Button label="Cancel" onPress={this.handleCancelAvatar} />
                     <Dialog.Button label="Ok" onPress={this.handleOk} />
                 </Dialog.Container>

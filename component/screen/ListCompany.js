@@ -6,7 +6,7 @@ import env from '../environment/env';
 
 const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
-const addCompany = require('../image/add.jpg') ;
+const addCompany = require('../image/add1.jpg') ;
  
 export default class ListChecked extends Component {
     static navigationOptions = {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
         top: 20
         },
     nameList: {
-        left: 0,
+        width: '75%',
         padding: 10,
         paddingRight: 30,
     },

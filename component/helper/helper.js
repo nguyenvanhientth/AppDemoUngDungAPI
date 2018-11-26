@@ -39,25 +39,6 @@ const helper =  {
             })
         return data;
     },
-    getAllCompany : async(access_token) => {
-        header = {
-            method: 'GET',
-            headers: {
-                'cache-control': 'no-cache',
-                Authorization: 'Bearer ' + access_token,
-                }
-            }
-        const data = await fetch(BASE_URL + 'Company/GetAllCompany',header)
-            .then(res => res.json)
-            .then(json => {
-                return json;
-            })
-            .catch(e => {
-                console.warn('GetCompany Error',e);
-                return null;
-            })
-        return data;
-    },
     getSupervisor : async(access_token) => {
         header = {
             method: 'GET',

@@ -27,12 +27,12 @@ class SplashPage extends Component {
     var { navigate } = this.props.navigation;
     setTimeout(() => {
       navigate (pageUrl, null);
-    }, 3000);
+    }, 2000);
   }
 
   render() {
     return (
-        <View style={{flex: 1, backgroundColor: '#DAD4D4', alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex: 1, backgroundColor: '#E5E5E5', alignItems: 'center', justifyContent: 'center'}}>
             <Image
                 style={{width: '100%', height: '100%', }}
                 source={logo}

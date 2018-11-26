@@ -41,11 +41,7 @@ export default class Login extends Component {
         alert('Ban chua nhap day du! ')
       }
       else{
-        this.setState({loading: true})
-        // let postData = new FormData();
-        // postData.append('UserName',userName);
-        // postData.append('PassWord',password);   
-        //console.warn('asd',userName,password)           
+        this.setState({loading: true})     
         fetch(serviceUrl,{
           method: "POST",  
         headers: {

@@ -3,7 +3,10 @@ import {StyleSheet,Text,View,Image,Dimensions,ActivityIndicator,Platform,Picker,
     AsyncStorage,TouchableOpacity,StatusBar,FlatList,TextInput} from 'react-native';
 import HeaderNavigation from './header/HeaderNavigation';
 import helper from '../helper/helper';
+import env from '../environment/env';
+import { red } from 'ansi-colors';
 
+const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
 const addUser = require('../image/addUser.png') ;
 const company = require('../image/company.png') ;
@@ -56,7 +59,6 @@ export default class Main extends Component {
                 })
             });
 //-----------------------------------------------------------
-            if (this.state.Position !== "Admin") {
                 helper.getRequest(token).then((data)=>{
                     this.setState({
                         data: data,
@@ -64,18 +66,29 @@ export default class Main extends Component {
                     this.array = data;
                 })        
     //-----------------------------------------------------------
-                helper.getAllCompany(token).then(data => {
+                let url = BASE_URL + 'Company/GetAllCompany';
+                fetch(url,{
+                    headers: {
+                    'cache-control': 'no-cache',
+                    Authorization: 'Bearer ' + token,
+                    },
+                })
+                .then((res) => res.json())
+                .then((resData) => { 
                     this.setState({
-                        data1: [{id: 0,name: 'All Company'},...data],
+                        data1 : [{id: 0,name: 'All Company'},...resData],
+                        });
+                        //console.warn('data',this.state.data);
                     })
+                .catch((err) => {
+                    console.warn(' loi update Area1',err);
                 })
     //-------------------------------------------------------------
                 helper.getSupervisor(token).then(data=> {
                     this.setState({
-                        dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data]
+                        dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data],
                         })
                     })
-                }
             }).then(() => this.setState({loading: false}))       
         } 
         catch (error) {
@@ -104,11 +117,12 @@ export default class Main extends Component {
             <View style = {styles.line}>
                 <Text style={styles.name} > {this.cutString(item.address)}</Text>
                 <Text >{this._name(item.repairPersonName,item.supervisorName)}</Text>
-                <View style = {styles.iconWrap}>{this.status(item.status)}</View>
             </View>
+            <View style = {styles.iconWrap}>{this.status(item.status)}</View>
          </TouchableOpacity>
         );
       }
+    
     renderHeader = () => {
         return(
             <View style = {styles.seach}>
@@ -171,9 +185,8 @@ export default class Main extends Component {
             })
     }
     _seachCompany = async (company) =>{
-        let arr = await this._seachStatus(this.state.value);
         this.setState({company:company})
-        if (company === 'All Company') {
+        if (company === 'All Company' || company === undefined) {
             company = ''
         }
         const newData = this.array.filter((item) => {
@@ -269,7 +282,7 @@ export default class Main extends Component {
                         <Picker
                             selectedValue = {this.state.company}
                             style = {styles.combobox}
-                            onValueChange = {this._seachCompany.bind(this)}
+                            onValueChange = {(selectedValue) =>this._seachCompany(selectedValue)}
                         >
                         {
                             this.state.data1.map((item,index) => {
@@ -354,7 +367,7 @@ export default class Main extends Component {
         }
     } 
 }
- 
+
 const styles = StyleSheet.create({
     Container: {
         width: Dimensions.get('window').width,
@@ -384,7 +397,7 @@ const styles = StyleSheet.create({
   },
   line: {
     paddingLeft: 10,
-    width: '75%'
+    width: '65%',
   },
   background:{
     flex: 1,
@@ -395,7 +408,8 @@ const styles = StyleSheet.create({
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
-    marginRight:10
+    marginRight:10,
+    marginLeft: 5,
     },
   icon:{
     width:100,
