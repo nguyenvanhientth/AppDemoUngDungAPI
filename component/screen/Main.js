@@ -122,7 +122,6 @@ export default class Main extends Component {
          </TouchableOpacity>
         );
       }
-    
     renderHeader = () => {
         return(
             <View style = {styles.seach}>

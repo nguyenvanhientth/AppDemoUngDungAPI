@@ -98,10 +98,18 @@ export default class CreateCompany extends Component {
           this.setState({
             image: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
             });
-        }).catch(e => alert(e));
+        }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
       }
     render() {
         var { navigate } = this.props.navigation;
+        if(this.state.loading){
+            return(
+                <View style = {styles.background}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }
+        else{
             return (
                 <ScrollView>
                 <View style={ styles.background}>
@@ -142,7 +150,7 @@ export default class CreateCompany extends Component {
                 </View>
                 </ScrollView>
             );
-        
+        }
     }
 }
 

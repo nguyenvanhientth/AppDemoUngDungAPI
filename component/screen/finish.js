@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, ScrollView, ActivityIndicator,
-  Image, TouchableOpacity, NativeModules, Dimensions, AsyncStorage
+  Image, TouchableOpacity, NativeModules, Dimensions, AsyncStorage, ToastAndroid
 } from 'react-native';
 import env from '../environment/env';
 
@@ -48,7 +48,7 @@ export default class Finish extends Component {
         image: {uri: image.path, width: image.width, height: image.height},
         images: null
       });
-    }).catch(e => alert(e));
+    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
   }
 
   pickMultiple() {
@@ -65,7 +65,7 @@ export default class Finish extends Component {
           return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
         })
       });
-    }).catch(e => alert(e));
+    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
   }
   renderImage(image) {
     return <Image style={{width: 300, height: 300, resizeMode: 'contain',marginLeft: 10, borderRadius: 10}} source={image} />

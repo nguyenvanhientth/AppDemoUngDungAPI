@@ -8,7 +8,8 @@ var STORAGE_KEY = 'key_access_token';
 const userIcon = require('../image/ic_user.png');
 const iconEmail = require('../image/email.png');
 const iconPhone = require('../image/phone.png');
-const company = require('../image/company.png')
+const company = require('../image/company.png');
+const avatar = require('../image/avatar.png');
 
 export default class SignUpPage extends Component {
     static navigationOptions = {
@@ -142,7 +143,9 @@ export default class SignUpPage extends Component {
     return (
         <ScrollView>
         <View style={ styles.background}>
-            <View style={styles.container}/>
+            <View style = {[{alignItems: "center"},styles.container]}>
+                <Image source={avatar} resizeMode="contain" style={styles.logo}/>
+            </View>
                 <View style={styles.wrapper}>
                     <View style={styles.inputWrap}>
                         <View style={styles.iconWrap}>
@@ -293,6 +296,10 @@ const styles = StyleSheet.create({
         color: '#333333',
         marginBottom: 5,
     },
+    logo: {
+        width: '100%',
+        height: '100%'
+    }
 });
 
  

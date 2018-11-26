@@ -119,7 +119,7 @@ export default class App extends Component {
         image: {uri: image.path, width: image.width, height: image.height},
         images: null
       });
-    }).catch(e => alert(e));
+    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
   }
 
   pickMultiple() {
@@ -136,7 +136,7 @@ export default class App extends Component {
           return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
         })
       });
-    }).catch(e => alert(e));
+    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
   }
   renderImage(image) {
     return <Image style={{width: 200, height: 200, resizeMode: 'contain',marginLeft: 10}} source={image} />
@@ -196,7 +196,7 @@ export default class App extends Component {
           ToastAndroid.show('Request Success!', ToastAndroid.CENTER);
         }
           else {
-            ToastAndroid.show('Update False!', ToastAndroid.CENTER);
+            ToastAndroid.show('Request False!', ToastAndroid.CENTER);
         }
       })
       .catch((err) => {
@@ -267,7 +267,7 @@ export default class App extends Component {
               </TouchableOpacity>
             </View>
             <View style = {{alignItems:'center', opacity: 1}}>
-              <TouchableOpacity onPress={this.Upload.bind(this)} style = {{ width: '45%',alignItems: "center", bottom: 10,borderRadius: 10, backgroundColor: '#2ECCFA'}}>
+              <TouchableOpacity onPress={()=>this.Upload()} style = {{ width: '45%',alignItems: "center", bottom: 10,borderRadius: 10, backgroundColor: '#2ECCFA'}}>
                 <Text style = {{fontSize: 20, padding: 10 }}>Submit</Text>
               </TouchableOpacity>
             </View>

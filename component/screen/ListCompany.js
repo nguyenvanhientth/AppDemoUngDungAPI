@@ -10,7 +10,7 @@ const addCompany = require('../image/add1.jpg') ;
  
 export default class ListChecked extends Component {
     static navigationOptions = {
-        title: 'List Company',
+        title: 'Company',
         headerStyle: {
             backgroundColor: '#29ACE4',
           },
