@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,
-    Image,AsyncStorage,ActivityIndicator,ScrollView,Dimensions} from 'react-native';
+    Image,AsyncStorage,ActivityIndicator,ScrollView,Dimensions, PermissionsAndroid} from 'react-native';
 import env from '../environment/env';
 
 const BASE_URL = env;
@@ -31,7 +31,27 @@ export default class Login extends Component {
       loading: false,
     };
   }
-
+  componentWillMount(){
+    this.requestCameraPermission();
+  }
+ requestCameraPermission = async() => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          'title': 'Cool App ACCESS_FINE_LOCATION Permission',
+          'message': 'Cool  App needs access to your ACCESS_FINE_LOCATION '
+        }
+      )
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the ACCESS_FINE_LOCATION")
+      } else {
+        console.log("ACCESS_FINE_LOCATION permission denied")
+      }
+    } catch (err) {
+      console.warn(err)
+    }
+  }
   _onPressLogin = () => {
       let serviceUrl =  BASE_URL + "Account/login";
       let userName = this.state.userNames;

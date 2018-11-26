@@ -52,8 +52,8 @@ export default class App extends Component {
       content: '',
       address: '',
       company: '',
-      latitude: this.props.navigation.getParam('lat'),
-      longitude: this.props.navigation.getParam('long'),
+      latitude: 0,
+      longitude: 0,
       data:[],
       mapRegion: null,
       loading: true,
@@ -68,7 +68,6 @@ export default class App extends Component {
       longitude: lastLong || this.state.lastLong
     });
   }
-
   componentDidMount(){
     this.watchID = navigator.geolocation.watchPosition((position) => {
       // Create the object to update this.state.mapRegion through the onRegionChange function
@@ -178,7 +177,7 @@ export default class App extends Component {
           name: `${sessionId}.jpg`,
         });
       });
-      console.warn('data',data);
+     // console.warn('data',data);
       fetch(url,{
         method: 'POST',
         headers: {
@@ -189,7 +188,7 @@ export default class App extends Component {
         body: data,
       })
       .then((res) => {
-        //console.warn(res); 
+        console.warn(res); 
         if(res.ok){
           var { navigate } = this.props.navigation;
           navigate('drawerStack');

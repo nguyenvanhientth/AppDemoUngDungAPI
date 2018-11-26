@@ -92,7 +92,7 @@ class ForgotPassword extends Component {
             <View style={styles.background}>
                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                     <Image
-                        style={{width: 350, height: 350, }}
+                        style={{width: '100%', height: '100%', }}
                         source={logo}
                         resizeMode = 'center'
                         />
