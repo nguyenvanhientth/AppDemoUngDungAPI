@@ -77,7 +77,7 @@ export default class App extends Component {
         longitude:      position.coords.longitude,
         latitudeDelta:  0.00922*1.5,
         longitudeDelta: 0.00421*1.5
-      }
+      };
       this.onRegionChange(region, region.latitude, region.longitude);
     });
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
@@ -96,14 +96,16 @@ export default class App extends Component {
         .then((res) => res.json())
         .then((resData) => { 
             this.setState({
-                data : [{name: 'Select Company!',id:''},...resData]
+                data : [{name: 'Select Company!',id:''},...resData],
+                loading: false
               });
             //  console.warn('data',this.state.data);
           })
         .catch((err) => {
+          this.setState({loading: false});
           console.warn(' loi update Area1',err);
         })
-      }).then( this.setState({loading: false}) )
+      })
   }
 
   pickSingleWithCamera(cropping) {
@@ -118,7 +120,7 @@ export default class App extends Component {
         image: {uri: image.path, width: image.width, height: image.height},
         images: null
       });
-    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+    }).catch(e => console.log(e));
   }
 
   pickMultiple() {
@@ -135,7 +137,7 @@ export default class App extends Component {
           return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
         })
       });
-    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+    }).catch(e => console.log(e));
   }
   renderImage(image) {
     return <Image style={{width: 200, height: 200, resizeMode: 'contain',marginLeft: 10}} source={image} />
@@ -316,8 +318,8 @@ camera: {
   footer: {
     position: 'absolute',
     flex:1,
-    right: 0,
-    bottom: 10,
+    right: 10,
+    bottom: 15,
     flexDirection: 'row',
     },
   combobox: {

@@ -12,7 +12,7 @@ import Information from './component/screen/Information';
 import ChanePassword from './component/screen/ChanePassword';
 import UpdateImage from './component/screen/UpdateImage';
 import SignUpPage from './component/screen/SignUpPage';
-import maps from './component/screen/maps/maps';
+import maps1 from './component/screen/maps/maps1';
 import ListCompany from './component/screen/ListCompany';
 import SelectedRequest from './component/screen/SelectedRequest';
 import finish from './component/screen/finish';
@@ -79,7 +79,7 @@ const MyApp = createStackNavigator({
     })},
   UpdateImagePage: {screen: UpdateImage},
   SignUpPage:{screen: SignUpPage},
-  MapsPage: {screen: maps},
+  MapsPage: {screen: maps1},
   ListCompanyPage: {screen: ListCompany},
   ListUserPage:{screen: ListUser},
   CheckedPage: {screen: SelectedRequest},

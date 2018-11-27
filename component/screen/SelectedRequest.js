@@ -42,6 +42,7 @@ export default class Request extends Component{
             if(token === undefined){
               var { navigate } = this.props.navigation;
               navigate('LoginPage');
+              this.setState({loadding: false})
             } 
             let id = this.state.id;   
             let url = BASE_URL + 'Request/GetRequestById?requestId=' + id;
@@ -97,13 +98,15 @@ export default class Request extends Component{
                     //console.warn("resJson",resJson);debugger;
                     this.setState({
                         Position: resJson.role,
+                        loadding: false
                     });   
                    // console.warn(this.state.Position)    
                 })
                 .catch ((error) => {
+                    this.setState({loadding: false});
                     console.warn('AsyncStorage error:' + error.message);
                 }) 
-                this.setState({loadding: false});
+                
             });
     }
     renderImage(image) {
@@ -138,19 +141,19 @@ export default class Request extends Component{
                   //console.warn(responseJSON);
                     if(responseJSON.ok){
                         this.props.navigation.navigate('drawerStack');
+                        this.setState({loadding: false})
                         ToastAndroid.show('Reqair Success!', ToastAndroid.CENTER);
                     }
                     else {
+                        this.setState({loadding: false})
                         ToastAndroid.show('Reqair False!', ToastAndroid.CENTER);
                     }
                     
                 })
                 .catch((err) => {
+                    this.setState({loadding: false})
                     console.warn('Error: ',err);
                 })
-            this.setState({
-                loadding:false
-            });
         })
     }
     _finish = () =>{
@@ -178,24 +181,27 @@ export default class Request extends Component{
                   //console.warn(responseJSON);
                     if(responseJSON.ok){
                         this.props.navigation.navigate('drawerStack');
+                        this.setState({loadding: false})
                         alert('Confirm Success!');
                     }
                     else {
                         alert('Confirm False!');
+                        this.setState({loadding: false})
                     }
                     
                 })
                 .catch((err) => {
+                    this.setState({loadding: false})
                     console.warn('Error: ',err);
                 })
-            this.setState({loadding: false})
+            
         })
     }
     render(){
         const image = this.state.images;
         if(this.state.loadding){
             return(
-                <View style = {styles.container}>
+                <View style = {{flex: 1,  justifyContent:'center',backgroundColor: '#ECF8FB'}}>
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>
             )

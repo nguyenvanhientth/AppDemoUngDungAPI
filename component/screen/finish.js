@@ -48,7 +48,7 @@ export default class Finish extends Component {
         image: {uri: image.path, width: image.width, height: image.height},
         images: null
       });
-    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+    }).catch(e =>console.log(e));
   }
 
   pickMultiple() {
@@ -65,7 +65,7 @@ export default class Finish extends Component {
           return {uri: i.path, width: i.width, height: i.height, mime: i.mime};
         })
       });
-    }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+    }).catch(e => console.log(e));
   }
   renderImage(image) {
     return <Image style={{width: 300, height: 300, resizeMode: 'contain',marginLeft: 10, borderRadius: 10}} source={image} />

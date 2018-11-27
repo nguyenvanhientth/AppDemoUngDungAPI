@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Platform } from 'react-native';
 import MapView,{ Marker} from 'react-native-maps';
 
 
@@ -25,7 +25,6 @@ export default class testCoords extends Component {
           latitudeDelta: 0.00922 * 1.5,
           longitudeDelta: 0.00421 * 1.5
         }
-
         this.setState({ mapRegion: region })
       }, null,
       { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },

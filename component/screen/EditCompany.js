@@ -99,7 +99,7 @@ export default class EditCompany extends Component {
             this.setState({
                 image: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
                 });
-        }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+        }).catch(e => console.log(e));
       }
     render() {
         var { navigate } = this.props.navigation;

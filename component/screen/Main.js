@@ -4,14 +4,12 @@ import {StyleSheet,Text,View,Image,Dimensions,ActivityIndicator,Platform,Picker,
 import HeaderNavigation from './header/HeaderNavigation';
 import helper from '../helper/helper';
 import env from '../environment/env';
-import { red } from 'ansi-colors';
 
 const BASE_URL = env;
 var STORAGE_KEY = 'key_access_token';
 const addUser = require('../image/addUser.png') ;
 const company = require('../image/company.png') ;
 const will = require('../image/willdo.png') ;
-const list = require('../image/list.png') ;
 const add = require('../image/add.png') ;
 const waiting = require('../image/waiting.png') ;
 const todo = require('../image/todo.png') ;
@@ -89,12 +87,13 @@ export default class Main extends Component {
                         dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data],
                         })
                     })
-            }).then(() => this.setState({loading: false}))       
+                    this.setState({loading:false})   
+            })  
         } 
         catch (error) {
-            this.setState({loading: false});
+            this.setState({loading:false}) 
             console.log('AsyncStorage error: ' + error.message);
-        }   
+        }  
     }
     
 //----------------------------------------------------------------------------------
@@ -226,7 +225,7 @@ export default class Main extends Component {
                     <HeaderNavigation {...this.props}></HeaderNavigation>
                     <View style = { styles.row}>
                         <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('SignUpPage')}  keyboardShouldPersistTaps={true}>
-                            <View style = {[styles.buttonAd,{backgroundColor:'#08B358'}]}>
+                            <View style = {[styles.buttonAd,{backgroundColor:'#00E469'}]}>
                                 <View style={styles.iconWrap}>
                                     <Image source = {addUser} style = {styles.icon}/>
                                 </View>
@@ -242,14 +241,14 @@ export default class Main extends Component {
                     </View>
                     <View style = { styles.row}>
                         <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {() =>alert('Will do')}  keyboardShouldPersistTaps={true}>
-                            <View style = {[styles.buttonAd,{backgroundColor: '#6AC6E5'}]}>
+                            <View style = {[styles.buttonAd,{backgroundColor: '#94DAF1'}]}>
                                 <View style={styles.iconWrap}>
                                     <Image source = {will} style = {styles.icon}/>
                                 </View>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity style= {styles.column} activeOpacity={.5} onPress = {()=>alert('Will do')} keyboardShouldPersistTaps={true}>
-                            <View style = {[styles.buttonAd,{backgroundColor:'#BEDB6E'}]}>
+                            <View style = {[styles.buttonAd,{backgroundColor:'#CDFA52'}]}>
                                 <View style={styles.iconWrap}>
                                     <Image source = {will} style = {styles.icon}/>
                                 </View>

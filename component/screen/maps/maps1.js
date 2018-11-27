@@ -40,14 +40,14 @@ export default class testCoords extends Component {
   }
 
   onMapPress(e) {
-    console.log(e.nativeEvent.coordinate.longitude);
-    let region = {
-      latitude:       e.nativeEvent.coordinate.latitude,
-      longitude:      e.nativeEvent.coordinate.longitude,
-      latitudeDelta:  0.00922*1.5,
-      longitudeDelta: 0.00421*1.5
-    }
-    this.onRegionChange(region, region.latitude, region.longitude);
+    // console.log(e.nativeEvent.coordinate.longitude);
+    // let region = {
+    //   latitude:       e.nativeEvent.coordinate.latitude,
+    //   longitude:      e.nativeEvent.coordinate.longitude,
+    //   latitudeDelta:  0.00922*1.5,
+    //   longitudeDelta: 0.00421*1.5
+    // }
+    //this.onRegionChange(region, region.latitude, region.longitude);
   }
 
   render() {
@@ -58,8 +58,9 @@ export default class testCoords extends Component {
           region={this.state.mapRegion}
           showsUserLocation={true}
           followUserLocation={true}
-          onRegionChange={this.onRegionChange.bind(this)}
-          onPress={this.onMapPress.bind(this)}>
+          region = {this.state.mapRegion}
+          //onRegionChange={this.onRegionChange.bind(this)}
+          >
           <MapView.Marker
             coordinate={{
               latitude: (this.state.lastLat + 0.00050) || -36.82339,

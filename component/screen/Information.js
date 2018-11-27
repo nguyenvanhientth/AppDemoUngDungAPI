@@ -50,10 +50,11 @@ export default class Information extends Component {
       loading: true,
       input: false,
       input1: false,
+      DOB1: null,
     };
   }
   
-  componentWillMount() {
+  componentDidMount() {
     try {
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;        
@@ -102,11 +103,15 @@ export default class Information extends Component {
     handleUpdate = ()=>{
         this.setState({loading: true});
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
-            let token = user_data_json;  
+            let token = user_data_json; 
+            let dateOfBirth = null; 
+            if (this.state.DOB1 !== this.state.DOB) {
+                dateOfBirth = this.state.DOB1;
+            }
             let serviceUrl = BASE_URL+  "Account/ChangeInformationUser";
             let firstName = this.state.firstName;
             let lastName = this.state.lastName;
-            let dateOfBirth = this.state.DOB;
+            
             let address = this.state.Address;
             let PhoneNumber = this.state.PhoneNumber;
             // kiem tra o day 
@@ -130,24 +135,27 @@ export default class Information extends Component {
                       console.warn('signup',responseJSON)
                           if(responseJSON.ok){
                               this.componentWillMount();
+                              this.setState({loading: false, input: false, input1: false})
                               ToastAndroid.show('Update Success!', ToastAndroid.CENTER);
                           }
                           else {
-                              ToastAndroid.show('Update False!', ToastAndroid.LONG);
+                                this.componentWillMount();
+                                this.setState({loading: false, input: false, input1: false})
+                                ToastAndroid.show('Update False!', ToastAndroid.LONG);
                           }      
                   })
                   .catch((error) => {
+                        this.setState({loading: false, input: false, input1: false})
                       console.warn('Error Update',error);
                   });  
           })
-          .then(this.setState({loading: false, input: false, input1: false}))
     }
     _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true, input1: true });
 
     _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
      _handleDatePicked = date => {
-        this.setState({ DOB: date.toString() });
+        this.setState({ DOB1: date.toString() });
         this._hideDateTimePicker();
     };
     _show =() =>{
@@ -164,7 +172,7 @@ export default class Information extends Component {
               source: {uri: images.path, width: images.width, height: images.height, mime: images.mime},
               updateAvata: true
             });
-        }).catch(e => ToastAndroid.show(e,ToastAndroid.CENTER));
+        }).catch(e => console.log(e));
       }
       handleOk = ()=>{
         this.setState({loading: true});
@@ -189,16 +197,19 @@ export default class Information extends Component {
             .then((response) =>{
                 if(response.ok){
                     this.componentWillMount();
+                    this.setState({loading: false,updateAvata: false})
                     ToastAndroid.show('Update Avatar Success!', ToastAndroid.CENTER);
                 }
                 else{
+                    this.setState({loading: false,updateAvata: false})
                     ToastAndroid.show('Update Avatar False!', ToastAndroid.CENTER);
                 }
             })
             .catch((error) =>{
+                this.setState({loading: false,updateAvata: false})
                 console.warn('Update Avatar Error!', error);
             })
-        }).then(this.setState({loading: false,updateAvata: false}))
+        })
       }
       show_input = (text,image,a) =>{
         return (
@@ -233,7 +244,7 @@ export default class Information extends Component {
     const { isDateTimePickerVisible } = this.state;
     if (this.state.loading) {
         return(
-           <View style = {{flex: 1,justifyContent:'center',}}>
+           <View style = {{flex: 1,justifyContent:'center',backgroundColor: '#ECF8FB'}}>
              <ActivityIndicator size="large" color="#0000ff" />
            </View>
          )
