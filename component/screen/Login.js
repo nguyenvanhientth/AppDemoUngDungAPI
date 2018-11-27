@@ -31,7 +31,7 @@ export default class Login extends Component {
       loading: false,
     };
   }
-  componentWillMount(){
+  componentDidMount(){
     this.requestCameraPermission();
   }
  requestCameraPermission = async() => {
@@ -112,7 +112,7 @@ export default class Login extends Component {
      var { navigate } = this.props.navigation;
      if (this.state.loading) {
        return(
-          <View style = {{flex: 1,justifyContent:'center',}}>
+          <View style = {{flex: 1,justifyContent:'center',backgroundColor: '#ECF8FB'}}>
             <ActivityIndicator size="large" color="#0000ff" />
           </View>
         )

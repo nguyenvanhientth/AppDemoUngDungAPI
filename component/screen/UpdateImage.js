@@ -57,6 +57,7 @@ export default class App extends Component {
       data:[],
       mapRegion: null,
       loading: true,
+      opacity: 1
     };
   }
 
@@ -102,8 +103,7 @@ export default class App extends Component {
         .catch((err) => {
           console.warn(' loi update Area1',err);
         })
-      })
-    this.setState({loading: false});
+      }).then( this.setState({loading: false}) )
   }
 
   pickSingleWithCamera(cropping) {
@@ -145,13 +145,11 @@ export default class App extends Component {
     return this.renderImage(image);
   }
   Upload = () => {
-    this.setState({loading: true});
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
       let token = user_data_json;   
       if(token === undefined){
         var { navigate } = this.props.navigation;
         navigate('LoginPage');
-        this.setState({loading: false});
        }    
       let url = BASE_URL + 'Request/InsertRequest';
       let data = new FormData();
@@ -161,14 +159,14 @@ export default class App extends Component {
       if (this.state.content.length ===0 ||this.state.address.length ===0 ||
         this.state.company.length === 0|| arrImage.length === 0) {
         alert('You have not entered enough!');
-        this.setState({loading: false});
       }
       else {
+        this.setState({loading: true, opacity: 0.1});
         data.append("Content",this.state.content);
-      data.append("Address",this.state.address);
-      data.append("CompanyId",this.state.company)
-      data.append("LatIng_longitude",this.state.longitude);
-      data.append("Latlng_latitude",this.state.latitude);
+        data.append("Address",this.state.address);
+        data.append("CompanyId",this.state.company)
+        data.append("LatIng_longitude",this.state.longitude);
+        data.append("Latlng_latitude",this.state.latitude);
       //console.warn('image',arrImage);
       arrImage.map((i) =>{
         data.append("PictureRequest",{
@@ -192,17 +190,20 @@ export default class App extends Component {
         if(res.ok){
           var { navigate } = this.props.navigation;
           navigate('drawerStack');
+          this.setState({loading: false, opacity: 1})
           ToastAndroid.show('Request Success!', ToastAndroid.CENTER);
         }
           else {
+            this.setState({loading: false, opacity: 1})
             ToastAndroid.show('Request False!', ToastAndroid.CENTER);
         }
       })
       .catch((err) => {
+        this.setState({loading: false, opacity: 1})
         console.warn(' Error Update image',err);
       });
       }
-    }).then(this.setState({loading: false}))
+    })
   }
   _updateCompany = (id) => {
     this.setState({company: id});
@@ -266,7 +267,8 @@ export default class App extends Component {
               </TouchableOpacity>
             </View>
             <View style = {{alignItems:'center', opacity: 1}}>
-              <TouchableOpacity onPress={()=>this.Upload()} style = {{ width: '45%',alignItems: "center", bottom: 10,borderRadius: 10, backgroundColor: '#2ECCFA'}}>
+              <TouchableOpacity disabled = {this.state.loading} onPress={()=>this.Upload()} style = {{ width: '45%',alignItems: "center", bottom: 10,borderRadius: 10, backgroundColor: '#2ECCFA',
+                opacity: this.state.opacity}}>
                 <Text style = {{fontSize: 20, padding: 10 }}>Submit</Text>
               </TouchableOpacity>
             </View>
@@ -281,6 +283,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     backgroundColor: '#E0F7FE',
+  },
+  background:{
+    flex: 1,
+    justifyContent:'center',
+    backgroundColor: '#ECF8FB'
   },
   view: {
     flex: 1
