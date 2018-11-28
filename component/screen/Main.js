@@ -27,8 +27,8 @@ export default class Main extends Component {
     super(props);
   
     this.state = {
-        data: [],
         Position: '',
+        data: [],
         companyName:'',
         addressCompany:'',
         loading: true,
@@ -41,21 +41,30 @@ export default class Main extends Component {
     };
     this.array = [];
   }
-  
-    componentWillMount () {
-    try {
+    componentWillMount(){
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;   
             if(token === undefined){
               var { navigate } = this.props.navigation;
               navigate('LoginPage');
-            }    
-//-----------get data async from helper----------------------
+              this.setState({
+                  loading: false
+              })
+            }
+            else{
+    //-----------get data async from helper----------------------
             helper.getUser(token).then((data) => {
                 this.setState({
                      Position: data.role,
                 })
             });
+            }    
+        })
+    }
+    componentDidMount () {
+    try {
+        AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+            let token = user_data_json;
 //-----------------------------------------------------------
                 helper.getRequest(token).then((data)=>{
                     this.setState({
@@ -75,10 +84,12 @@ export default class Main extends Component {
                 .then((resData) => { 
                     this.setState({
                         data1 : [{id: 0,name: 'All Company'},...resData],
+                        loading: false
                         });
                         //console.warn('data',this.state.data);
                     })
                 .catch((err) => {
+                    this.setState({loading: false})
                     console.warn(' loi update Area1',err);
                 })
     //-------------------------------------------------------------
@@ -87,7 +98,6 @@ export default class Main extends Component {
                         dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data],
                         })
                     })
-                    this.setState({loading:false})   
             })  
         } 
         catch (error) {
