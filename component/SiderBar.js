@@ -87,7 +87,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#29ACE4', 
         alignItems: 'center', 
         justifyContent: 'center',
-        padding: 20
+        padding: 20,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10
     },
     userInfoText:{
         color: '#fff', 

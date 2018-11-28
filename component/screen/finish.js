@@ -183,6 +183,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 15,
 },
 inputWrap:{
   flexDirection:"row",
@@ -198,7 +203,7 @@ input:{
 buttonText: {
   fontSize: 16,
   color:'#FFFFFF',
-  textAlign: 'center',   
+  textAlign: 'center',  
 },
 camera: {
   width: 50, 

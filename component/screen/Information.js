@@ -51,6 +51,7 @@ export default class Information extends Component {
       input: false,
       input1: false,
       DOB1: null,
+      auto: false,
     };
   }
   
@@ -132,7 +133,7 @@ export default class Information extends Component {
                   })
               })
                   .then((responseJSON) => {  
-                      console.warn('signup',responseJSON)
+                      //console.warn('signup',responseJSON)
                           if(responseJSON.ok){
                               this.componentWillMount();
                               this.setState({loading: false, input: false, input1: false})
@@ -212,22 +213,36 @@ export default class Information extends Component {
         })
       }
       show_input = (text,image,a) =>{
-        return (
-            this.state.input ? 
-            <View style={styles.text}> 
-                <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
-                <TextInput autoFocus = {true} style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
-            </View>:
-            <View style={styles.text}> 
-                <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
-                <Text style = {styles.text1}> {text} </Text> 
-            </View>
+        if(a===1){
+            return (
+                this.state.input ? 
+                <View style={styles.text}>
+                    <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                    <TextInput autoFocus = {true} style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
+                </View>:
+                <View style={styles.text}> 
+                    <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                    <Text style = {styles.text1}> {text} </Text> 
+                </View>
+                )}
+        else {
+            return (
+                this.state.input ? 
+                <View style={styles.text}>
+                    <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                    <TextInput style = {styles.text1} onChangeText = {(text)=> this._changeText(text,a)}>{text}</TextInput>
+                </View>:
+                <View style={styles.text}> 
+                    <Image style = {styles.icon} resizeMode="contain" source = {image} /> 
+                    <Text style = {styles.text1}> {text} </Text> 
+                </View>
             )
-      }
+        }
+    }
       _changeText = (text,a) => {
         switch (a) {
             case 1:
-                this.setState({lastName: text})
+                this.setState({firstName: text})
                 break;
             case 2:
                 this.setState({Address: text})
@@ -236,7 +251,7 @@ export default class Information extends Component {
                 this.setState({PhoneNumber: text})
                 break;
             default:
-            this.setState({firstName: text})
+            this.setState({lastName: text})
                 break;
         }
       }
@@ -277,8 +292,8 @@ export default class Information extends Component {
                     </View>
                 </View>
                 <View style={styles.ThongTin}>
-                    {this.show_input(this.state.firstName,name)}
-                    {this.show_input(this.state.lastName,name,1)}
+                    {this.show_input(this.state.firstName,name,1)}
+                    {this.show_input(this.state.lastName,name)}
                     {this.show_input(this.state.Address,address,2)}
                     <View style = {styles.text}>
                         <Image style = {styles.icon} resizeMode="contain" source = {dob} />
@@ -356,7 +371,8 @@ const styles = StyleSheet.create({
     borderBottomColor: 'gray',
     padding: 20,
     width: '100%',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    borderRadius: 20
   },
   text1: {
     color: 'gray',
@@ -408,7 +424,9 @@ const styles = StyleSheet.create({
     contentName: {
         alignItems: "center",
         backgroundColor: '#29ACE4',
-        padding: 20
+        padding: 20,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10
     },
     icon1: {
         width: 30,

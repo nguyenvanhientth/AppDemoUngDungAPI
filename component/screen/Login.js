@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,
+import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,DeviceEventEmitter,
     Image,AsyncStorage,ActivityIndicator,ScrollView,Dimensions, PermissionsAndroid} from 'react-native';
+import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 import env from '../environment/env';
 
 const BASE_URL = env;
@@ -33,6 +34,30 @@ export default class Login extends Component {
   }
   componentDidMount(){
     this.requestCameraPermission();
+    LocationServicesDialogBox.checkLocationServicesIsEnabled({
+      message: "<h2>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+      ok: "YES",
+      cancel: "NO",
+      enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+      showDialog: true, // false => Opens the Location access page directly
+      openLocationServices: true, // false => Directly catch method is called if location services are turned off
+      preventOutSideTouch: false, //true => To prevent the location services popup from closing when it is clicked outside
+      preventBackClick: false, //true => To prevent the location services popup from closing when it is clicked back button
+      providerListener: true // true ==> Trigger "locationProviderStatusChange" listener when the location state changes
+    }).then(function(success) {
+      // success => {alreadyEnabled: true, enabled: true, status: "enabled"} 
+          navigator.geolocation.getCurrentPosition((position) => {
+              let initialPosition = JSON.stringify(position);
+              this.setState({ initialPosition });
+          }, error => console.log(error), { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 });
+      }.bind(this)
+    ).catch((error) => {
+      console.log(error.message);
+    });
+  
+    DeviceEventEmitter.addListener('locationProviderStatusChange', function(status) { // only trigger when "providerListener" is enabled
+      console.log(status); //  status => {enabled: false, status: "disabled"} or {enabled: true, status: "enabled"}
+  });
   }
  requestCameraPermission = async() => {
     try {
@@ -120,9 +145,15 @@ export default class Login extends Component {
       return (
         <ScrollView horizontal={false}>
           <View style={ styles.background}>
-              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',margin: 20,backgroundColor: '#ECF8FB'}}>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',margin: 20,backgroundColor: '#E0F7FE',}}>
               <Image
-                  style={{width: '100%', height: '100%', }}
+                  style={{width: '100%',
+                     height: '100%',
+                     shadowColor: '#000',
+                     shadowOffset: { width: 0, height: 2 },
+                     shadowOpacity: 0.8,
+                     shadowRadius: 2,
+                     elevation: 15, }}
                   source={logo}
                   resizeMode = 'center'
                   />
@@ -167,7 +198,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height:  Dimensions.get('window').height,
     flex: 1,
-    backgroundColor: '#ECF8FB'
+    backgroundColor: '#E0F7FE'
   },
   wrapper:{
       paddingHorizontal:15,
@@ -177,17 +208,27 @@ const styles = StyleSheet.create({
       marginVertical: 5,
       height:45,
       backgroundColor:"transparent",
+      borderBottomWidth: 0,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 15,
   },
   input:{
     flex: 1,
     paddingHorizontal: 5,
     backgroundColor:'#FFF',
+    borderTopRightRadius: 20,        
+    borderBottomRightRadius: 20,
     },
   iconWrap:{
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor:"#2E9AFE"
+    backgroundColor:"#2E9AFE",
+    borderBottomLeftRadius: 10,        
+    borderTopLeftRadius: 10,
     },
   icon:{
     width:20,
@@ -200,9 +241,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 15,
+    borderBottomWidth: 0,
     },
-
-
   buttonText: {
       fontSize: 16,
       color:'#fff',

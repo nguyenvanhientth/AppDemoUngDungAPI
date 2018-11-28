@@ -172,7 +172,7 @@ handleCancel = ()=>{
                 <View style={styles.container} > 
                     <FlatList
                     data={this.state.data}
-                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    //ItemSeparatorComponent = {this.FlatListItemSeparator}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     />
@@ -208,7 +208,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingRight: 10,
         paddingTop: 15,
-        paddingBottom: 15
+        paddingBottom: 15,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        borderBottomWidth: 1,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: '#607D8B'
       },
     name: {
       fontFamily: 'Verdana',

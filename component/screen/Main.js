@@ -138,19 +138,6 @@ export default class Main extends Component {
             </View>
         )
     };
-    
-      FlatListItemSeparator = () => {
-        return (
-          <View
-            style={{
-              height: 1,
-              flex: 1,
-              backgroundColor: "#607D8B",
-              paddingHorizontal: 5,
-            }}
-          />
-        );
-      }
     status = (status) =>{
         if(status === 'Waiting'){
           return <Image style = {styles.status} source = {waiting}/>
@@ -305,7 +292,6 @@ export default class Main extends Component {
                     this.state.data ? 
                     <FlatList
                     data={this.state.data}
-                    ItemSeparatorComponent = {this.FlatListItemSeparator}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     ListHeaderComponent = {this.renderHeader}
@@ -361,7 +347,6 @@ export default class Main extends Component {
                     this.state.data ?
                     <FlatList
                     data={this.state.data}
-                    ItemSeparatorComponent = {this.FlatListItemSeparator}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     ListHeaderComponent = {this.renderHeader}
@@ -383,7 +368,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         paddingLeft: 10,
-        paddingTop: (Platform.OS === 'ios')?20:0
+        paddingTop: (Platform.OS === 'ios')?20:0,
+        paddingRight:10,
     },
   footer: {
     position: 'absolute',
@@ -416,8 +402,8 @@ const styles = StyleSheet.create({
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
-    marginRight:10,
-    marginLeft: 5,
+    marginRight:5,
+    marginLeft: 10,
     },
   icon:{
     width:100,
@@ -427,6 +413,12 @@ const styles = StyleSheet.create({
         marginTop: 10,
         width:50,
         height:50,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 2,
+        borderBottomWidth: 0
         },
   wrapper:{
       paddingHorizontal:15,
@@ -437,6 +429,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems:'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: '#607D8B'
   },
 name: {
     fontFamily: 'Verdana',

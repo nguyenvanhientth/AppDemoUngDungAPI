@@ -34,7 +34,15 @@ class SplashPage extends Component {
     return (
         <View style={{flex: 1, backgroundColor: '#ECF8FB', alignItems: 'center', justifyContent: 'center'}}>
             <Image
-                style={{width: '100%', height: '100%',backgroundColor: '#ECF8FB' }}
+                style={{width: '100%', 
+                height: '100%',
+                backgroundColor: '#ECF8FB',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 2,
+                elevation: 15,
+                borderBottomWidth: 0 }}
                 source={logo}
                 resizeMode = 'center'
                 />

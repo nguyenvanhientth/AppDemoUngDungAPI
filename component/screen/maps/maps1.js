@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {  StyleSheet, Text, View,Button } from 'react-native';
 import MapView from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
 
 
 export default class testCoords extends Component {
@@ -14,16 +15,23 @@ export default class testCoords extends Component {
   }
 
   componentDidMount() {
-    this.watchID = navigator.geolocation.watchPosition((position) => {
-      // Create the object to update this.state.mapRegion through the onRegionChange function
-      let region = {
-        latitude:       position.coords.latitude,
-        longitude:      position.coords.longitude,
-        latitudeDelta:  0.00922*1.5,
-        longitudeDelta: 0.00421*1.5
-      }
-      this.onRegionChange(region, region.latitude, region.longitude);
-    });
+    {
+      this.watchID = Geolocation.watchPosition((position) => {
+        // Create the object to update this.state.mapRegion through the onRegionChange function
+        let region = {
+          latitude:       position.coords.latitude,
+          longitude:      position.coords.longitude,
+          latitudeDelta:  0.00922*1.5,
+          longitudeDelta: 0.00421*1.5
+        }
+        this.onRegionChange(region, region.latitude, region.longitude);
+      },
+      (error) => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 });
+    }
   }
 
   onRegionChange(region, lastLat, lastLong) {
@@ -36,7 +44,7 @@ export default class testCoords extends Component {
   }
 
   componentWillUnmount() {
-    navigator.geolocation.clearWatch(this.watchID);
+    Geolocation.clearWatch(this.watchID);
   }
 
   onMapPress(e) {

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, ScrollView, TextInput,Picker,ActivityIndicator,
   Image, TouchableOpacity, NativeModules, ToastAndroid, AsyncStorage
 } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 import env from '../environment/env';
 // import { PermissionsAndroid } from 'react-native';
 
@@ -52,12 +53,12 @@ export default class App extends Component {
       content: '',
       address: '',
       company: '',
-      latitude: 0,
-      longitude: 0,
+      latitude: null,
+      longitude: null,
       data:[],
       mapRegion: null,
       loading: true,
-      opacity: 1
+      opacity: 1,
     };
   }
 
@@ -65,12 +66,12 @@ export default class App extends Component {
     this.setState({
       mapRegion: region,
       // If there are no new values set use the the current ones
-      latitude: lastLat || this.state.lastLat,
-      longitude: lastLong || this.state.lastLong
+      latitude: lastLat,
+      longitude: lastLong 
     });
   }
   componentDidMount(){
-    this.watchID = navigator.geolocation.watchPosition((position) => {
+      Geolocation.getCurrentPosition((position) => {
       // Create the object to update this.state.mapRegion through the onRegionChange function
       let region = {
         latitude:       position.coords.latitude,
@@ -79,7 +80,13 @@ export default class App extends Component {
         longitudeDelta: 0.00421*1.5
       };
       this.onRegionChange(region, region.latitude, region.longitude);
-    });
+    },
+    (error) => {
+      // See error code charts below.
+      console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 });
+  //-------------------------------------------------------------------------------------
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
       let token = user_data_json;   
       if(token === undefined){
@@ -249,6 +256,12 @@ export default class App extends Component {
                     }
                 </Picker>
             </View>
+            <View style={{flex: 1, flexDirection: "row",margin: 20, alignItems: "center"}}>
+              {this.state.latitude ? <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: {this.state.latitude}</Text> 
+                  : <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: Loading...</Text> }
+              {this.state.longitude ? <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Longitude: {this.state.longitude}</Text> 
+                  : <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: Loading...</Text> }
+            </View>
             <View style = {{flexDirection: 'row', alignItems: 'center',alignContent: 'center', justifyContent: 'center'}}>
             <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} keyboardShouldPersistTaps={true}>
               <View style={[styles.button]}>
@@ -261,7 +274,6 @@ export default class App extends Component {
               </View>
             </TouchableOpacity>
             </View>
-            <View style={{flex:0.5, paddingTop: 10}}></View>
             </ScrollView>
             <View style={styles.footer}>
               <TouchableOpacity onPress={()=>{this.props.navigation.navigate('MapsPage')}} keyboardShouldPersistTaps={true}>
@@ -304,12 +316,18 @@ inputWrap:{
   height:null,
   backgroundColor:"transparent",
   marginLeft: 30,
-  marginRight: 30
+  marginRight: 30,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.8,
+  shadowRadius: 2,
+  elevation: 15,
 },
 input:{
   flex: 1,
   paddingHorizontal: 5,
   backgroundColor:'#FFF',
+  borderRadius: 25,
   },
 camera: {
   width: 50, 
@@ -328,7 +346,7 @@ camera: {
     flex:1,
     paddingHorizontal: 5,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   icon:{
     width: 20,
@@ -338,7 +356,8 @@ camera: {
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor:"#288BF5"
+    backgroundColor:"#288BF5",
+    borderRadius: 5,
   },
   label: {
     flex: 1, 

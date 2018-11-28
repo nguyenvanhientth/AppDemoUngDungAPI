@@ -495,22 +495,22 @@ const styles = StyleSheet.create({
      },
     container: {
         flex: 1,
-        backgroundColor: '#E5E5E5',
+        backgroundColor: '#ECF8FB',
       },
-      slider: { backgroundColor: '#000', height: 350 },
+      slider: { backgroundColor: '#000', height: '70%' },
       content1: {
         width: '100%',
-        height: 50,
+        height: '10%',
         marginBottom: 10,
-        backgroundColor: '#E5E5E5',
+        backgroundColor: '#ECF8FB',
         justifyContent: 'center',
         alignItems: 'center',
       },
       content2: {
         width: '100%',
-        height: 100,
+        height: '20%',
         marginTop: 10,
-        backgroundColor: '#E5E5E5',
+        backgroundColor: '#ECF8FB',
         marginLeft: 15,
         marginBottom: 15
       },
@@ -546,9 +546,10 @@ const styles = StyleSheet.create({
         color: '#AFEFF9',
       },
       customSlide: {
-        backgroundColor: 'green',
+        backgroundColor: '#ECF8FB',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 10
       },
       customImage: {
         width: '100%',

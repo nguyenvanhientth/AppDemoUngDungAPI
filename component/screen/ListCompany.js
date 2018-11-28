@@ -60,18 +60,6 @@ export default class ListChecked extends Component {
         })
     }
  
-  FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          flex: 1,
-          backgroundColor: "#607D8B",
-          paddingHorizontal: 5,
-        }}
-      />
-    );
-  }
   changeStatus =(id) =>{
     this.setState({
         dialogStatus: true,
@@ -168,7 +156,6 @@ export default class ListChecked extends Component {
             <View style={styles.container} > 
                 <FlatList
                 data={this.state.data}
-                ItemSeparatorComponent = {this.FlatListItemSeparator}
                 renderItem={this._renderList}
                 keyExtractor={item => item.id}
                 />
@@ -197,12 +184,18 @@ const styles = StyleSheet.create({
       backgroundColor: '#F5FCFF',
     },
     flatview: {
-      justifyContent: 'flex-start',
-      flex: 1,
-      flexDirection: 'row',
-      paddingRight: 100,
-      paddingTop: 15,
-      paddingBottom: 15
+        justifyContent: 'flex-start',
+        flex: 1,
+        flexDirection: 'row',
+        paddingRight: 100,
+        paddingTop: 15,
+        paddingBottom: 15,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        borderBottomWidth: 1,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: '#607D8B'
     },
     name: {
       fontFamily: 'Verdana',

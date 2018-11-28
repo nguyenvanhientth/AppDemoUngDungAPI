@@ -151,19 +151,28 @@ const styles = StyleSheet.create({
     inputWrap:{
         flexDirection:"row",
         marginVertical: 5,
-        height:36,
+        height:45,
         backgroundColor:"transparent",
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 15,
     },
     input:{
       flex: 1,
       paddingHorizontal: 5,
       backgroundColor:'#FFF',
+      borderTopRightRadius: 20,
+      borderBottomRightRadius: 20,
       },
     iconWrap:{
       paddingHorizontal:7,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor:"#2E9AFE"
+      backgroundColor:"#2E9AFE",
+      borderTopLeftRadius: 10,
+      borderBottomLeftRadius: 10
       },
     icon:{
       width:20,
@@ -179,7 +188,12 @@ const styles = StyleSheet.create({
       marginVertical:8,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: 10
+      borderRadius: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 15,
       },
   
   
