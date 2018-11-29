@@ -260,7 +260,7 @@ export default class App extends Component {
               {this.state.latitude ? <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: {this.state.latitude}</Text> 
                   : <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: Loading...</Text> }
               {this.state.longitude ? <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Longitude: {this.state.longitude}</Text> 
-                  : <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Latitude: Loading...</Text> }
+                  : <Text style={[styles.input,{padding: 5, fontSize: 15}]}>Longitude: Loading...</Text> }
             </View>
             <View style = {{flexDirection: 'row', alignItems: 'center',alignContent: 'center', justifyContent: 'center'}}>
             <TouchableOpacity onPress={() => this.pickSingleWithCamera(false)} keyboardShouldPersistTaps={true}>

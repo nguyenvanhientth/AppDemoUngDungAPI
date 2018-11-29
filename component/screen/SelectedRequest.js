@@ -277,14 +277,14 @@ export default class Request extends Component{
                         )}
                         />
                         <View style={styles.content2}>
-                        <Text style={styles.contentText}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text></Text>
-                        <Text style={styles.contentText}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
-                        </View>
+                            <Text style={styles.contentText}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text></Text>
+                            <Text style={styles.contentText}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
                         <TouchableOpacity activeOpacity={.5} onPress={()=> this._receive()} keyboardShouldPersistTaps={true}>
                              <View style={styles.buttonClick}>
                                 <Text style={styles.buttonText}> Receive </Text>
                             </View>      
                         </TouchableOpacity>
+                        </View>
                     </View>
                 )
             } else {
@@ -337,12 +337,12 @@ export default class Request extends Component{
                         <View style={styles.content2}>
                         <Text style={styles.contentText}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text></Text>
                         <Text style={styles.contentText}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
-                        </View>
                         <TouchableOpacity activeOpacity={.5} onPress={()=> this.props.navigation.navigate('FinishPage',{id:this.state.id})} keyboardShouldPersistTaps={true}>
                             <View style={styles.buttonClick}>
                                 <Text style={styles.buttonText}> Finish </Text>
                             </View>      
                         </TouchableOpacity>
+                        </View>
                     </View>
                 )                
             }
@@ -398,12 +398,12 @@ export default class Request extends Component{
                     <View style={styles.content2}>
                         <Text style={styles.contentText}><Image style = {styles.time} source = {address}/> <Text style = {styles.text}>{this.state.address}</Text></Text>
                         <Text style={styles.contentText}><Image style = {styles.time} source = {time} /> <Text style = {styles.text}>{this.state.repairPersonId}</Text></Text>
+                        <TouchableOpacity activeOpacity={.5} onPress={()=> this._finish()} keyboardShouldPersistTaps={true}>
+                            <View style={styles.buttonClick}>
+                                <Text style={styles.buttonText}> Confirm </Text>
+                            </View>      
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity activeOpacity={.5} onPress={()=> this._finish()} keyboardShouldPersistTaps={true}>
-                        <View style={styles.buttonClick}>
-                            <Text style={styles.buttonText}> Confirm </Text>
-                        </View>      
-                    </TouchableOpacity>
                     </View>
                     )
             } else {
@@ -466,7 +466,7 @@ export default class Request extends Component{
 }
 const styles = StyleSheet.create({
     text: {
-       padding: 10,
+       padding: 5,
         marginTop: 1,
         justifyContent: 'flex-start',
         fontSize: 15,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ECF8FB',
       },
-      slider: { backgroundColor: '#000', height: '70%' },
+      slider: { backgroundColor: '#000', height: '50%' },
       content1: {
         width: '100%',
         height: '10%',
@@ -508,15 +508,14 @@ const styles = StyleSheet.create({
       },
       content2: {
         width: '100%',
-        height: '20%',
-        marginTop: 10,
+        height: '40%',
+        margin: 5,
         backgroundColor: '#ECF8FB',
-        marginLeft: 15,
-        marginBottom: 15
+        padding: 5
       },
       contentText: { 
         color: '#fff',
-        padding: 10,
+        padding: 5,
         justifyContent: 'flex-start',
         fontSize: 23,
         color: '#0101DF',

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet,Text,TextInput,Button,View,Alert,TouchableOpacity,DeviceEventEmitter,
+import {StyleSheet,Text,TextInput,View,Alert,TouchableOpacity,DeviceEventEmitter,
     Image,AsyncStorage,ActivityIndicator,ScrollView,Dimensions, PermissionsAndroid} from 'react-native';
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 import env from '../environment/env';
@@ -107,12 +107,11 @@ export default class Login extends Component {
                if(access_token !=undefined){
                           try {
                               AsyncStorage.setItem(STORAGE_KEY, access_token);
-                              this.setState({loading:false})
                                 navigate('drawerStack');
                             } catch (error) {
                               console.log('AsyncStorage error: ' + error.message);
-                              this.setState({loading:false})
-                            }    
+                            };
+                            this.setState({loading:false});
                }
                else{
                   this.setState({loading:false})
@@ -138,7 +137,7 @@ export default class Login extends Component {
      if (this.state.loading) {
        return(
           <View style = {{flex: 1,justifyContent:'center',backgroundColor: '#ECF8FB'}}>
-            <ActivityIndicator size="large" color="#0000ff" />
+            <ActivityIndicator size='large' color="#0000ff" />
           </View>
         )
      } else {
@@ -148,12 +147,7 @@ export default class Login extends Component {
               <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',margin: 20,backgroundColor: '#E0F7FE',}}>
               <Image
                   style={{width: '100%',
-                     height: '100%',
-                     shadowColor: '#000',
-                     shadowOffset: { width: 0, height: 2 },
-                     shadowOpacity: 0.8,
-                     shadowRadius: 2,
-                     elevation: 15, }}
+                     height: '100%', }}
                   source={logo}
                   resizeMode = 'center'
                   />
@@ -213,7 +207,7 @@ const styles = StyleSheet.create({
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.8,
       shadowRadius: 2,
-      elevation: 15,
+      elevation: 10,
   },
   input:{
     flex: 1,
@@ -245,7 +239,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 15,
+    elevation: 10,
     borderBottomWidth: 0,
     },
   buttonText: {

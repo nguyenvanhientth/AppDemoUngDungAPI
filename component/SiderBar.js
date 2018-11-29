@@ -16,7 +16,7 @@ export default class SiderBar extends Component {
             avatar: null
         }
     }
-    componentWillMount() {
+    componentDidMount() {
         try {
             AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
                 let token = user_data_json;        
@@ -44,9 +44,9 @@ export default class SiderBar extends Component {
             console.log('AsyncStorage error: ' + error.message);
             }            
       }
-      componentDidUpdate(){
-            this.componentWillMount();
-        }
+    //   componentDidUpdate(){
+    //         this.componentDidMount();
+    //     }
     render(){
         const props = this.props;
         return (

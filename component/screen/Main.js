@@ -14,6 +14,7 @@ const add = require('../image/add.png') ;
 const waiting = require('../image/waiting.png') ;
 const todo = require('../image/todo.png') ;
 const done = require('../image/done.png') ;
+const approved = require('../image/approved.png') ;
 const main = require('../image/home.png') ;
 
 export default class Main extends Component {
@@ -145,8 +146,12 @@ export default class Main extends Component {
         else if (status === 'To Do'){
           return <Image style = {styles.status} source = {todo}/>
         }
-        else 
-        return <Image style = {styles.status} source = {done}/>
+        else if (status === 'Done') {
+            return <Image style = {styles.status} source = {done}/>
+        }
+        else {
+            return <Image style = {styles.status} source = {approved}/>
+        }
       }
     _name = (name1,name2) =>{
         if(name1 === null){
@@ -288,16 +293,18 @@ export default class Main extends Component {
                     </View>
                 </View>
                 <View style = {styles.Container}>
-                {
-                    this.state.data ? 
                     <FlatList
                     data={this.state.data}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     ListHeaderComponent = {this.renderHeader}
-
-                    /> : <Text style = {styles.text}> No Request!~ </Text>
-                }
+                    /> 
+                    {
+                        this.state.data.length ? null : 
+                        <View style = {[styles.container,{alignItems: 'center'}]}>
+                            <Text style = {styles.name}>No Request!!!</Text>
+                        </View>
+                    }
                 </View>
                 <View style={styles.footer}>
                     <TouchableOpacity activeOpacity={.5} onPress={()=>this.props.navigation.navigate('UpdateImagePage')} keyboardShouldPersistTaps={true}>
@@ -343,15 +350,18 @@ export default class Main extends Component {
                     </View>
                 </View>
                 <View style = {[styles.Container]}>
-                {
-                    this.state.data ?
                     <FlatList
                     data={this.state.data}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     ListHeaderComponent = {this.renderHeader}
 
-                    />:<Text style = {styles.text}>No Job</Text>
+                    />
+                {
+                    this.state.data.length ? null : 
+                    <View style = {[styles.container,{alignItems: 'center'}]}>
+                        <Text style = {styles.name}>No Job!!!</Text>
+                    </View>
                 }
                 </View>
             </View>
@@ -402,7 +412,7 @@ const styles = StyleSheet.create({
     paddingHorizontal:7,
     alignItems: "center",
     justifyContent: "center",
-    marginRight:5,
+    marginRight:20,
     marginLeft: 10,
     },
   icon:{
@@ -432,8 +442,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     borderBottomWidth: 1,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
     borderColor: '#607D8B'
   },
 name: {

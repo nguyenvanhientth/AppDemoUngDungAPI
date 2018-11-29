@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
-    Image, ToastAndroid,ActivityIndicator,Switch } from "react-native";
+    Image, ToastAndroid,ActivityIndicator,Switch,TextInput } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
@@ -10,7 +10,7 @@ var STORAGE_KEY = 'key_access_token';
  
 export default class ListUser extends Component {
     static navigationOptions = {
-        title: 'List Users',
+        title: 'Users',
         headerStyle: {
             backgroundColor: '#29ACE4',
           },
@@ -26,7 +26,9 @@ export default class ListUser extends Component {
             id: '',
             dialogStatus: false,
             loading: true
-    }
+        }
+        this.array = [];
+
   };
   componentDidMount(){
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
@@ -51,6 +53,7 @@ export default class ListUser extends Component {
                   loading: false
                 });
                 //console.warn('data',this.state.data);
+                this.array = resData;
             })
           .catch((err) => {
             console.warn(' Error Update!',err);
@@ -81,8 +84,8 @@ export default class ListUser extends Component {
             <Image style = {styles.anh} source= {avatar} resizeMode="contain"/>
         }
         <View style = {styles.nameList}>
-            <Text style={styles.name} >UserName: {item.userName}</Text>
-            <Text style={styles.email} >Email: {(item.email)}</Text>
+            <Text style={styles.name} >{item.userName}</Text>
+            <Text style={styles.email} >{(item.email)}</Text>
             <Text style={styles.email} >Role: {(item.role)}</Text>
         </View>
         <View style = {styles.iconWrap}>
@@ -102,6 +105,22 @@ export default class ListUser extends Component {
      </TouchableOpacity>
     );
     }
+    renderHeader = () => {
+        return(
+            <View style = {styles.seach}>
+                <TextInput style = {{backgroundColor: '#fff', borderRadius: 20}} placeholder = 'Type here...' onChangeText = {(text) => this.seachName(text)} />
+            </View>
+        )
+    };
+    seachName = (text) =>{
+        const newData = this.array.filter((item) => {
+            const itemData = `${item.userName.toUpperCase()}
+            ${item.email.toUpperCase()}`;
+            const textData = text.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+        });
+        this.setState({data : newData})
+    };
     changeActivate = (id)=>{
         this.setState({
             dialogStatus: true,
@@ -161,13 +180,6 @@ handleCancel = ()=>{
             </View>
           )
     } else {
-        if (this.state.data.length === 0) {
-           return(
-            <View style={[styles.container,{alignItems: "center"}]} > 
-                <Text style = {styles.name}>No Employees!!!</Text>
-            </View>
-            )
-        } else {
             return (
                 <View style={styles.container} > 
                     <FlatList
@@ -175,7 +187,14 @@ handleCancel = ()=>{
                     //ItemSeparatorComponent = {this.FlatListItemSeparator}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
+                    ListHeaderComponent = {this.renderHeader()}
                     />
+                    {
+                        this.state.data.length ? null : 
+                        <View style = {[styles.container,{alignItems: 'center'}]}>
+                            <Text style = {styles.name}>No Employees!!!</Text>
+                        </View>
+                    }
                     <Dialog.Container visible = {this.state.dialogStatus}>
                         <Dialog.Title> You are want change activate or deactivate! </Dialog.Title>
                         <Dialog.Button label="Cancel" onPress={this.handleCancel} />
@@ -184,7 +203,7 @@ handleCancel = ()=>{
                 </View>
                 ); 
             }
-        }
+            
     }
 }
 const styles = StyleSheet.create({
@@ -212,8 +231,6 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         borderBottomWidth: 1,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
         borderColor: '#607D8B'
       },
     name: {

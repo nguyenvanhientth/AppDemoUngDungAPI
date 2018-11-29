@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, FlatList, AsyncStorage,
-    ActivityIndicator,Image, Switch, ToastAndroid } from "react-native";
+    ActivityIndicator,Image, Switch, ToastAndroid, TextInput } from "react-native";
 import Dialog from "react-native-dialog";
 import env from '../environment/env';
 
@@ -21,15 +21,15 @@ export default class ListChecked extends Component {
     };
     constructor(props){
         super(props);
-        this.state = {
-            data: [],
-            dialogStatus: false,
-            id:'',
-            companyName:'',
-            addressCompany: '',
-            loading: true,
-            toggel: false,
+    this.state = {
+        data: [],
+        dialogStatus: false,
+        id:'',
+        companyName:'',
+        addressCompany: '',
+        loading: true,
     }
+    this.array = []
   };
   componentDidMount(){
     AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
@@ -51,6 +51,7 @@ export default class ListChecked extends Component {
                   data : resData,
                   loading: false
                 });
+                this.array = resData;
                 //console.warn('data',this.state.data);
             })
           .catch((err) => {
@@ -111,9 +112,9 @@ export default class ListChecked extends Component {
           dialogStatus:false,
       })
   }
-    componentDidUpdate(prevProps){
-        this.componentDidMount();
-    }
+    // componentDidUpdate(prevProps){
+    //     this.componentDidMount();
+    // }
   _renderList = ({ item }) => {
     return (
      <TouchableOpacity disabled = {this.state.loading} style={styles.flatview} 
@@ -141,8 +142,23 @@ export default class ListChecked extends Component {
         </View>
     </TouchableOpacity>
     );
-
   }
+  renderHeader = () => {
+    return(
+        <View style = {styles.seach}>
+            <TextInput style = {{backgroundColor: '#fff', borderRadius: 20}} placeholder = 'Type here...' onChangeText = {(text) => this.seachName(text)} />
+        </View>
+    )
+    };
+seachName = (text) =>{
+    const newData = this.array.filter((item) => {
+        const itemData = `${item.name.toUpperCase()} 
+        ${item.address.toUpperCase()}`;
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+    });
+    this.setState({data: newData});
+}
 
   render() {
     if (this.state.loading) {
@@ -158,7 +174,14 @@ export default class ListChecked extends Component {
                 data={this.state.data}
                 renderItem={this._renderList}
                 keyExtractor={item => item.id}
+                ListHeaderComponent = {this.renderHeader}
                 />
+                {
+                        this.state.data.length ? null : 
+                        <View style = {[styles.container,{alignItems: 'center'}]}>
+                            <Text style = {styles.name}>No Company!!!</Text>
+                        </View>
+                    }
                 <View style={styles.footer}>
                     <TouchableOpacity activeOpacity={.5} onPress = {()=>this.props.navigation.navigate('CreateCompanyPage')} keyboardShouldPersistTaps={true}>
                         <View style={[styles.button,{borderRadius: 50}]}>
@@ -193,8 +216,6 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         borderBottomWidth: 1,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
         borderColor: '#607D8B'
     },
     name: {
@@ -254,5 +275,8 @@ const styles = StyleSheet.create({
         width:50,
         height:50,
         borderRadius:50,
+        },
+    seach: {
+        marginTop: 10,
         },
 })
