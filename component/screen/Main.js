@@ -38,7 +38,9 @@ export default class Main extends Component {
         dataName: [],
         company: '',
         supervisorName: '',
+        page : 1,
         status: [{id:0, name: 'All Status'},{id:1, name: 'Waiting'},{id:2, name: 'To do'},{id:3, name: 'Done'},{id:4, name: 'Approved'},],
+        refreshing: false,
     };
     this.array = [];
   }
@@ -67,12 +69,13 @@ export default class Main extends Component {
         AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
             let token = user_data_json;
 //-----------------------------------------------------------
-                helper.getRequest(token).then((data)=>{
-                    this.setState({
-                        data: data,
-                    })
-                    this.array = data;
-                })        
+                // helper.getRequest(token).then((data)=>{
+                //     this.setState({
+                //         data: data,
+                //     })
+                //     this.array = data;
+                // })  
+                this.getRequest();      
     //-----------------------------------------------------------
                 let url = BASE_URL + 'Company/GetAllCompany';
                 fetch(url,{
@@ -99,14 +102,45 @@ export default class Main extends Component {
                         dataName : [{id: 0,supervisorFirstName: 'Supervisor',supervisorLastName: 'All'},...data],
                         })
                     })
-            })  
-        } 
-        catch (error) {
-            this.setState({loading:false}) 
-            console.log('AsyncStorage error: ' + error.message);
-        }  
+                })  
+            } 
+            catch (error) {
+                this.setState({loading:false, refreshing: false}) 
+                console.log('AsyncStorage error: ' + error.message);
+            }  
+    };
+    getRequest = () => {
+        let page = this.state.page;
+        console.warn('page',page)
+        setTimeout(()=> {
+            AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+                let token = user_data_json;
+                let url = BASE_URL + `Request/GetRequest?pageIndex=${page}`;
+                fetch(url,{
+                    method: 'GET',
+                    headers: {
+                    'cache-control': 'no-cache',
+                    Authorization: 'Bearer ' + token,
+                    },
+                })
+                .then((res) => res.json())
+                .then((resData) => { 
+                    this.setState({
+                        data : [...this.state.data, ...resData],
+                        loading: false,
+                        refreshing: false
+                        });
+                        console.warn('data',resData);
+                        this.array = [...this.array, ...resData];
+                    })
+                .catch((err) => {
+                    console.warn(' Error Update!',err);
+                    this.setState({loading: false})
+                })
+            })
+        },1500);
+        
     }
-    
 //----------------------------------------------------------------------------------
     cutString = (string) =>{
         var n = string.length;
@@ -209,6 +243,48 @@ export default class Main extends Component {
         this.setState({
             data: newData
         })
+    };
+    handleRefresh = () => {
+        this.array = [];
+        this.setState({
+            refreshing : true,
+            page : 1,
+            data: []
+        },
+        () => {
+            this.getRequest();
+            //this.componentDidMount();
+        })
+    };
+    renderFooter = () => {
+        return(
+            <View style={{
+                paddingVertical: 20,
+                backgroundColor: '#cedoce'
+            }}>
+                <ActivityIndicator animating size = 'large' />
+            </View>
+        )
+    }
+    renderSeparator = () => {
+        return (
+            <View
+                style = {{
+                    height: 1,
+                    width: '86%',
+                    marginLeft: '14%',
+                    backgroundColor: '#ced0ce'
+                }}
+            />
+        )
+    }
+    handeLoadMore = () => {
+        this.setState({
+            page : this.state.page + 1
+        },
+        () => {
+            this.getRequest();
+        })
     }
 
  render() {
@@ -297,11 +373,17 @@ export default class Main extends Component {
                     data={this.state.data}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
+                    ItemSeparatorComponent = {this.renderSeparator}
                     ListHeaderComponent = {this.renderHeader}
+                    refreshing = {this.state.refreshing}
+                    onRefresh = {this.handleRefresh}
+                    ListFooterComponent = {this.renderFooter}
+                    onEndReached = {this.handeLoadMore}
+                    onEndReachedThreshold = {0}
                     /> 
                     {
                         this.state.data.length ? null : 
-                        <View style = {[styles.container,{alignItems: 'center'}]}>
+                        <View style = {[styles.Container,{alignItems: 'center'}]}>
                             <Text style = {styles.name}>No Request!!!</Text>
                         </View>
                     }
@@ -355,11 +437,16 @@ export default class Main extends Component {
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
                     ListHeaderComponent = {this.renderHeader}
-
+                    refreshing = {this.state.refreshing}
+                    onRefresh = {this.handleRefresh}
+                    ItemSeparatorComponent = {this.renderSeparator}
+                    ListFooterComponent = {this.renderFooter}
+                    onEndReached = {this.handeLoadMore}
+                    onEndReachedThreshold = {0}
                     />
                 {
                     this.state.data.length ? null : 
-                    <View style = {[styles.container,{alignItems: 'center'}]}>
+                    <View style = {[styles.Container,{alignItems: 'center'}]}>
                         <Text style = {styles.name}>No Job!!!</Text>
                     </View>
                 }
