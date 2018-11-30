@@ -381,12 +381,12 @@ export default class Main extends Component {
                     onRefresh = {this.handleRefresh}
                     ListFooterComponent = {this.renderFooter}
                     onEndReached = {this.handeLoadMore}
-                    onEndReachedThreshold = {0.3}
+                    onEndReachedThreshold = {0.5}
                     /> 
                     {
                         this.state.data.length ? null : 
                         <View style = {[styles.Container,{alignItems: 'center'}]}>
-                            <Text style = {styles.name}>No Request!!!</Text>
+                            <Text style = {styles.name}>Loading!!!</Text>
                         </View>
                     }
                 </View>
@@ -444,12 +444,12 @@ export default class Main extends Component {
                     //ItemSeparatorComponent = {this.renderSeparator}
                     ListFooterComponent = {this.renderFooter}
                     onEndReached = {this.handeLoadMore}
-                    onEndReachedThreshold = {0.3}//cach vi tri 0,5 de load more
+                    onEndReachedThreshold = {0.5}//cach vi tri 0,5 de load more
                     />
                 {
                     this.state.data.length ? null : 
                     <View style = {[styles.Container,{alignItems: 'center'}]}>
-                        <Text style = {styles.name}>No Job!!!</Text>
+                        <Text style = {styles.name}>Loading!!!</Text>
                     </View>
                 }
                 </View>
