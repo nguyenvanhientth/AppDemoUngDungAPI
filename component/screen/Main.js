@@ -41,6 +41,7 @@ export default class Main extends Component {
         page : 1,
         status: [{id:0, name: 'All Status'},{id:1, name: 'Waiting'},{id:2, name: 'To do'},{id:3, name: 'Done'},{id:4, name: 'Approved'},],
         refreshing: false,
+        load: false
     };
     this.array = [];
   }
@@ -111,35 +112,33 @@ export default class Main extends Component {
     };
     getRequest = () => {
         let page = this.state.page;
-        console.warn('page',page)
-        setTimeout(()=> {
-            AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
-                let token = user_data_json;
-                let url = BASE_URL + `Request/GetRequest?pageIndex=${page}`;
-                fetch(url,{
-                    method: 'GET',
-                    headers: {
-                    'cache-control': 'no-cache',
-                    Authorization: 'Bearer ' + token,
-                    },
-                })
-                .then((res) => res.json())
-                .then((resData) => { 
-                    this.setState({
-                        data : [...this.state.data, ...resData],
-                        loading: false,
-                        refreshing: false
-                        });
-                        console.warn('data',resData);
-                        this.array = [...this.array, ...resData];
-                    })
-                .catch((err) => {
-                    console.warn(' Error Update!',err);
-                    this.setState({loading: false})
-                })
+        console.warn('page',page);
+        this.setState({load: true});
+        AsyncStorage.getItem(STORAGE_KEY).then((user_data_json) => {
+            let token = user_data_json;
+            let url = BASE_URL + `Request/GetRequest?pageIndex=${page}`;
+            fetch(url,{
+                method: 'GET',
+                headers: {
+                'cache-control': 'no-cache',
+                Authorization: 'Bearer ' + token,
+                },
             })
-        },1500);
-        
+            .then((res) => res.json())
+            .then((resData) => { 
+                this.setState({
+                    data : [...this.state.data, ...resData],
+                    load: false
+                    });
+                    console.warn('data',resData);
+                    this.array = [...this.array, ...resData];
+                })
+            .catch((err) => {
+                console.warn(' Error Update!',err);
+                this.setState({loading: false})
+            });
+            this.setState({refreshing: false, loading: false})
+        })
     }
 //----------------------------------------------------------------------------------
     cutString = (string) =>{
@@ -257,6 +256,9 @@ export default class Main extends Component {
         })
     };
     renderFooter = () => {
+        if (!this.state.load) {
+            return null
+        }
         return(
             <View style={{
                 paddingVertical: 20,
@@ -280,7 +282,7 @@ export default class Main extends Component {
     }
     handeLoadMore = () => {
         this.setState({
-            page : this.state.page + 1
+            page : this.state.page + 1,
         },
         () => {
             this.getRequest();
@@ -373,13 +375,13 @@ export default class Main extends Component {
                     data={this.state.data}
                     renderItem={this._renderList}
                     keyExtractor={item => item.id}
-                    ItemSeparatorComponent = {this.renderSeparator}
+                    //ItemSeparatorComponent = {this.renderSeparator}
                     ListHeaderComponent = {this.renderHeader}
                     refreshing = {this.state.refreshing}
                     onRefresh = {this.handleRefresh}
                     ListFooterComponent = {this.renderFooter}
                     onEndReached = {this.handeLoadMore}
-                    onEndReachedThreshold = {0}
+                    onEndReachedThreshold = {0.3}
                     /> 
                     {
                         this.state.data.length ? null : 
@@ -439,10 +441,10 @@ export default class Main extends Component {
                     ListHeaderComponent = {this.renderHeader}
                     refreshing = {this.state.refreshing}
                     onRefresh = {this.handleRefresh}
-                    ItemSeparatorComponent = {this.renderSeparator}
+                    //ItemSeparatorComponent = {this.renderSeparator}
                     ListFooterComponent = {this.renderFooter}
                     onEndReached = {this.handeLoadMore}
-                    onEndReachedThreshold = {0}
+                    onEndReachedThreshold = {0.3}//cach vi tri 0,5 de load more
                     />
                 {
                     this.state.data.length ? null : 
